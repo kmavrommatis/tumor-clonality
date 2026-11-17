@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>subclonal_deconvolution_guide</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-79108a0fc1995748cbd19a5b0e3e3e7c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+
+
+
+
+<section id="subclonal-deconvolution-in-bulk-ngs-data-tools-statistics-and-feasibility" class="level1">
+<h1>Subclonal deconvolution in bulk NGS data: tools, statistics, and feasibility</h1>
+<p>This guide covers tools for subclonal deconvolution of tumors from bulk whole exome sequencing (WES) and whole genome sequencing (WGS), with attention to how each tool handles copy-number alterations (CNAs). It estimates how sequencing depth and tumor purity limit subclone detection, and describes four problems that affect real analyses: copy-number effects, errors in upstream purity and copy-number calls, the neutral tail of low-frequency mutations, and the trade-off between deeper sequencing and more samples.</p>
+<section id="subclonal-deconvolution-tools-and-how-they-handle-cnas" class="level2">
+<h2 class="anchored" data-anchor-id="subclonal-deconvolution-tools-and-how-they-handle-cnas">1. Subclonal deconvolution tools and how they handle CNAs</h2>
+<p>Restricting an analysis to diploid regions discards much of the genome, so the table records how each tool treats copy number. Tools are listed by year of publication, followed by CliPP (a widely used preprint) and two benchmark studies. In the CNA handling column, <em>Yes</em> means the tool models copy number when it estimates cancer cell fractions (CCFs) or builds trees; <em>CN-centric</em> means it infers subclones from copy-number profiles rather than from SNVs; <em>No</em> means it should be run only on copy-neutral regions; and <em>Not stated</em> means the original abstract does not say. Every DOI was checked against its PubMed record, except Cloe (<em>Ann Appl Stat</em>, not indexed in PubMed), whose DOI comes from the publisher. BayClone appeared in conference proceedings without a DOI, so it links to PubMed instead.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">#</th>
+<th style="text-align: left;">Tool</th>
+<th style="text-align: left;">Publication</th>
+<th style="text-align: left;">CNA handling</th>
+<th style="text-align: left;">Algorithm &amp; Requirements Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><strong>ABSOLUTE</strong></td>
+<td style="text-align: left;">Carter et al., <em>Nat Biotechnol</em> 2012 <a href="https://doi.org/10.1038/nbt.2203">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Estimates purity and ploidy from segmented CN and SNV allele fractions, then converts each mutation to a CCF and calls it clonal or subclonal; needs CN segments and SNV counts.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;"><strong>DPClust</strong> (+ Battenberg)</td>
+<td style="text-align: left;">Nik-Zainal et al., <em>Cell</em> 2012 <a href="https://doi.org/10.1016/j.cell.2012.04.023">DOI</a>; Bolli et al., <em>Nat Commun</em> 2014 <a href="https://doi.org/10.1038/ncomms3997">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Dirichlet-process clustering of CN- and purity-corrected CCFs, single or multi-sample; needs SNV counts plus subclonal CN and purity, typically from WGS.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;"><strong>THetA / THetA2</strong></td>
+<td style="text-align: left;">Oesper et al., <em>Genome Biol</em> 2013 <a href="https://doi.org/10.1186/gb-2013-14-7-r80">DOI</a>; Oesper et al., <em>Bioinformatics</em> 2014 <a href="https://doi.org/10.1093/bioinformatics/btu651">DOI</a></td>
+<td style="text-align: left;">CN-centric</td>
+<td style="text-align: left;">Infers the mixture of tumor populations and their CN profiles from read depth, with THetA2 adding B-allele frequency (BAF) and WES support; needs tumor/normal depth and BAF.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;"><strong>TrAp</strong></td>
+<td style="text-align: left;">Strino et al., <em>Nucleic Acids Res</em> 2013 <a href="https://doi.org/10.1093/nar/gkt641">DOI</a></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Solves for all subclonal trees consistent with aggregate mutation frequencies under sum constraints; needs cellular frequencies from one sample.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;"><strong>PyClone</strong></td>
+<td style="text-align: left;">Roth et al., <em>Nat Methods</em> 2014 <a href="https://doi.org/10.1038/nmeth.2883">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Dirichlet-process beta-binomial MCMC that integrates over possible mutation genotypes given major/minor CN; needs ref/alt counts, allele-specific CN and purity, and supports multiple samples.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6</td>
+<td style="text-align: left;"><strong>SciClone</strong></td>
+<td style="text-align: left;">Miller et al., <em>PLoS Comput Biol</em> 2014 <a href="https://doi.org/10.1371/journal.pcbi.1003665">DOI</a></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Variational Bayesian beta/binomial mixture on VAFs from one or more samples; uses CN segments only to restrict analysis to copy-neutral, LOH-free regions.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">7</td>
+<td style="text-align: left;"><strong>PhyloSub</strong></td>
+<td style="text-align: left;">Jiao et al., <em>BMC Bioinformatics</em> 2014 <a href="https://doi.org/10.1186/1471-2105-15-35">DOI</a></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Tree-structured stick-breaking prior with MCMC on VAF-derived frequencies (PhyloWGS’s predecessor); assumes diploid loci.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">8</td>
+<td style="text-align: left;"><strong>Clomial</strong></td>
+<td style="text-align: left;">Zare et al., <em>PLoS Comput Biol</em> 2014 <a href="https://doi.org/10.1371/journal.pcbi.1003703">DOI</a></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Binomial latent-clone model fit by EM to multi-sample allele counts; assumes CN-neutral loci.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">9</td>
+<td style="text-align: left;"><strong>EXPANDS</strong></td>
+<td style="text-align: left;">Andor et al., <em>Bioinformatics</em> 2014 <a href="https://doi.org/10.1093/bioinformatics/btt622">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Builds a cell-frequency probability distribution for each mutation from allele frequency and local CN, then clusters these into subpopulations; needs SNV frequencies plus CN segments.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td style="text-align: left;"><strong>CHAT</strong></td>
+<td style="text-align: left;">Li &amp; Li, <em>Genome Biol</em> 2014 <a href="https://doi.org/10.1186/s13059-014-0473-4">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Estimates segment-level aneuploid fractions from depth and BAF, then adjusts SNV allele frequencies to CCFs; needs tumor/normal depth and BAF.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">11</td>
+<td style="text-align: left;"><strong>cloneHD</strong></td>
+<td style="text-align: left;">Fischer et al., <em>Cell Rep</em> 2014 <a href="https://doi.org/10.1016/j.celrep.2014.04.055">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Hidden Markov model jointly inferring subclonal CN, BAF and SNV genotypes across samples; needs read-depth, BAF and SNV tracks, best suited to WGS.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">12</td>
+<td style="text-align: left;"><strong>SubcloneSeeker</strong></td>
+<td style="text-align: left;">Qiao et al., <em>Genome Biol</em> 2014 <a href="https://doi.org/10.1186/s13059-014-0443-x">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Exhaustively enumerates subclone structures consistent with the prevalences of SNV and CNV clusters; needs pre-clustered prevalence estimates.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">13</td>
+<td style="text-align: left;"><strong>TITAN</strong></td>
+<td style="text-align: left;">Ha et al., <em>Genome Res</em> 2014 <a href="https://doi.org/10.1101/gr.180281.114">DOI</a></td>
+<td style="text-align: left;">CN-centric</td>
+<td style="text-align: left;">HMM segmenting subclonal CN and LOH and estimating the cellular prevalence of each event; needs tumor/normal WGS or WES depth and germline allelic ratios.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">14</td>
+<td style="text-align: left;"><strong>PhyloWGS</strong></td>
+<td style="text-align: left;">Deshwar et al., <em>Genome Biol</em> 2015 <a href="https://doi.org/10.1186/s13059-015-0602-8">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Tree-structured stick-breaking MCMC that places SNVs and CNA segments jointly on a phylogeny with a CN correction to VAFs; needs SNV counts plus subclonal CN calls.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">15</td>
+<td style="text-align: left;"><strong>LICHeE</strong></td>
+<td style="text-align: left;">Popic et al., <em>Genome Biol</em> 2015 <a href="https://doi.org/10.1186/s13059-015-0647-8">DOI</a></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Builds lineage trees from multi-sample VAF clusters under ancestry constraints; requires CN-neutral SNVs.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">16</td>
+<td style="text-align: left;"><strong>CITUP</strong></td>
+<td style="text-align: left;">Malikic et al., <em>Bioinformatics</em> 2015 <a href="https://doi.org/10.1093/bioinformatics/btv003">DOI</a></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Combinatorial or quadratic-integer-programming search over tree topologies fitting multi-sample frequencies; diploid assumption.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">17</td>
+<td style="text-align: left;"><strong>AncesTree</strong></td>
+<td style="text-align: left;">El-Kebir et al., <em>Bioinformatics</em> 2015 <a href="https://doi.org/10.1093/bioinformatics/btv261">DOI</a></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Integer linear program (ILP) for the VAF factorization problem under a perfect phylogeny; needs multi-sample VAFs at diploid loci.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">18</td>
+<td style="text-align: left;"><strong>SCHISM</strong></td>
+<td style="text-align: left;">Niknafs et al., <em>PLoS Comput Biol</em> 2015 <a href="https://doi.org/10.1371/journal.pcbi.1004416">DOI</a></td>
+<td style="text-align: left;">Yes (via CCF input)</td>
+<td style="text-align: left;">Hypothesis tests of lineage precedence between clusters, followed by a genetic-algorithm tree search; needs CN- and purity-adjusted CCFs.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">19</td>
+<td style="text-align: left;"><strong>BayClone</strong></td>
+<td style="text-align: left;">Sengupta et al., <em>Pac Symp Biocomput</em> 2015 (no DOI; <a href="https://pubmed.ncbi.nlm.nih.gov/25592605/">PubMed</a>)</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Bayesian feature-allocation model assigning SNVs to latent subclones; uses read counts at loci assumed diploid.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">20</td>
+<td style="text-align: left;"><strong>Canopy</strong></td>
+<td style="text-align: left;">Jiang et al., <em>PNAS</em> 2016 <a href="https://doi.org/10.1073/pnas.1522203113">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Bayesian MCMC phylogeny jointly using SNA allele counts and allele-specific CNA segment ratios; needs single- or multi-sample SNV counts and allele-specific CN.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">21</td>
+<td style="text-align: left;"><strong>SPRUCE</strong></td>
+<td style="text-align: left;">El-Kebir et al., <em>Cell Syst</em> 2016 <a href="https://doi.org/10.1016/j.cels.2016.07.004">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Enumerates multi-state perfect phylogenies in which SNVs and CNAs co-evolve; needs multi-sample VAFs and allele-specific CN.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">22</td>
+<td style="text-align: left;"><strong>BubbleTree</strong></td>
+<td style="text-align: left;">Zhu et al., <em>Nucleic Acids Res</em> 2016 <a href="https://doi.org/10.1093/nar/gkv1102">DOI</a></td>
+<td style="text-align: left;">CN-centric</td>
+<td style="text-align: left;">Jointly estimates purity, ploidy, allele-specific CN and clonality from a graph of depth ratio against BAF; needs tumor/normal depth, BAF and SNV calls.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">23</td>
+<td style="text-align: left;"><strong>Cloe</strong></td>
+<td style="text-align: left;">Marass et al., <em>Ann Appl Stat</em> 2016 <a href="https://doi.org/10.1214/16-AOAS986">DOI</a></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Phylogenetic latent-feature model fit by MCMC to multi-sample VAFs; assumes CN-neutral loci.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">24</td>
+<td style="text-align: left;"><strong>Treeomics</strong></td>
+<td style="text-align: left;">Reiter et al., <em>Nat Commun</em> 2017 <a href="https://doi.org/10.1038/ncomms14114">DOI</a></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Bayesian inference of whether each mutation is present per sample, followed by an ILP phylogeny for multi-region data; tolerant of CN effects but does not model them.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">25</td>
+<td style="text-align: left;"><strong>ClonEvol</strong></td>
+<td style="text-align: left;">Dang et al., <em>Ann Oncol</em> 2017 <a href="https://doi.org/10.1093/annonc/mdx517">DOI</a></td>
+<td style="text-align: left;">Inherited</td>
+<td style="text-align: left;">Bootstrap-based clonal ordering and visualization of pre-computed clusters; CN handling depends on the upstream clustering tool.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">26</td>
+<td style="text-align: left;"><strong>CTPsingle</strong></td>
+<td style="text-align: left;">Donmez et al., <em>J Comput Biol</em> 2017 <a href="https://doi.org/10.1089/cmb.2016.0148">DOI</a></td>
+<td style="text-align: left;">Not stated</td>
+<td style="text-align: left;">Infers purity and clonality from a single low-coverage sample (around 30x); needs SNV counts.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">27</td>
+<td style="text-align: left;"><strong>QuantumClone</strong></td>
+<td style="text-align: left;">Deveau et al., <em>Bioinformatics</em> 2018 <a href="https://doi.org/10.1093/bioinformatics/bty016">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">EM clustering correcting for genotype and CN, with BIC model selection, for joint multi-sample analysis; needs SNV counts, CN genotypes and purity.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">28</td>
+<td style="text-align: left;"><strong>Sclust</strong></td>
+<td style="text-align: left;">Cun et al., <em>Nat Protoc</em> 2018 <a href="https://doi.org/10.1038/nprot.2018.033">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Infers purity, ploidy and subclonal CN, then clusters CN-corrected CCFs; needs tumor/normal BAMs (WGS preferred).</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">29</td>
+<td style="text-align: left;"><strong>CloneFinder</strong></td>
+<td style="text-align: left;">Miura et al., <em>Bioinformatics</em> 2018 <a href="https://doi.org/10.1093/bioinformatics/bty469">DOI</a></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Phylogeny-aware iterative decomposition of multi-region SNV frequencies into clone genotypes; best used on CN-neutral SNVs.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">30</td>
+<td style="text-align: left;"><strong>TUSV</strong></td>
+<td style="text-align: left;">Eaton et al., <em>Bioinformatics</em> 2018 <a href="https://doi.org/10.1093/bioinformatics/bty270">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">ILP deconvolution into a phylogeny that includes SNVs, CNAs and structural variants (SVs); needs multi-sample WGS SNV, CN and SV calls.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">31</td>
+<td style="text-align: left;"><strong>CloneDeMix</strong></td>
+<td style="text-align: left;">Tai et al., <em>PLoS One</em> 2018 <a href="https://doi.org/10.1371/journal.pone.0206579">DOI</a></td>
+<td style="text-align: left;">CN-centric</td>
+<td style="text-align: left;">Two-way mixture Poisson model on read depth inferring subclonal CN, mutational cellular prevalence and mutation order; needs tumor/normal depth.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">32</td>
+<td style="text-align: left;"><strong>BAMSE</strong></td>
+<td style="text-align: left;">Toosi et al., <em>BMC Bioinformatics</em> 2019 <a href="https://doi.org/10.1186/s12859-019-2824-3">DOI</a></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Bayesian model selection over the number of subclones and tree topology from read counts; mainly assumes diploid loci.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">33</td>
+<td style="text-align: left;"><strong>CALDER</strong></td>
+<td style="text-align: left;">Myers et al., <em>Cell Syst</em> 2019 <a href="https://doi.org/10.1016/j.cels.2019.05.010">DOI</a></td>
+<td style="text-align: left;">Yes (via input)</td>
+<td style="text-align: left;">Mixed-ILP phylogeny that respects the time order of longitudinal samples; needs CN-adjusted counts from serial samples.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">34</td>
+<td style="text-align: left;"><strong>GenoClone</strong></td>
+<td style="text-align: left;">Zou, Jin &amp; Au, <em>Brief Bioinform</em> 2019 <a href="https://doi.org/10.1093/bib/bby084">DOI</a></td>
+<td style="text-align: left;">Not stated</td>
+<td style="text-align: left;">Combines VAF with linkage between somatic and germline variants from paired-end or long reads to infer subclones; needs reads spanning both.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">35</td>
+<td style="text-align: left;"><strong>B-SCITE</strong></td>
+<td style="text-align: left;">Malikic et al., <em>Nat Commun</em> 2019 <a href="https://doi.org/10.1038/s41467-019-10737-5">DOI</a></td>
+<td style="text-align: left;">Partial</td>
+<td style="text-align: left;">Infers tumor phylogenies from combined single-cell and bulk sequencing data and is reported to stay robust when bulk VAFs are distorted by CN; needs both bulk and single-cell data.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">36</td>
+<td style="text-align: left;"><strong>BaSiC</strong></td>
+<td style="text-align: left;">Sun et al., <em>Biometrics</em> 2020 <a href="https://doi.org/10.1111/biom.13198">DOI</a></td>
+<td style="text-align: left;">Not stated</td>
+<td style="text-align: left;">Jointly models bulk and single-cell DNA-seq to infer intratumor heterogeneity; needs both data types.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">37</td>
+<td style="text-align: left;"><strong>PyClone-VI</strong></td>
+<td style="text-align: left;">Gillis &amp; Roth, <em>BMC Bioinformatics</em> 2020 <a href="https://doi.org/10.1186/s12859-020-03919-2">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Variational-inference version of PyClone’s CN-aware mixture that scales to WGS-sized mutation sets; needs ref/alt counts, major/minor CN and purity.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">38</td>
+<td style="text-align: left;"><strong>MOBSTER</strong></td>
+<td style="text-align: left;">Caravagna et al., <em>Nat Genet</em> 2020 <a href="https://doi.org/10.1038/s41588-020-0675-5">DOI</a>; R package: <em>BMC Bioinformatics</em> 2020 <a href="https://doi.org/10.1186/s12859-020-03863-1">DOI</a></td>
+<td style="text-align: left;">Yes (per karyotype)</td>
+<td style="text-align: left;">Beta-mixture plus Pareto-tail model that accounts for neutral within-clone mutations, fitted separately for each karyotype; needs high-depth WGS counts plus allele-specific CN and purity.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">39</td>
+<td style="text-align: left;"><strong>FastClone</strong></td>
+<td style="text-align: left;">Xiao et al., <em>Nat Commun</em> 2020 <a href="https://doi.org/10.1038/s41467-020-18169-2">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Fast probabilistic deconvolution assigning SNVs to subclones while modeling which CN allele they lie on; single-sample only, and needs SNV counts plus CN and purity.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">40</td>
+<td style="text-align: left;"><strong>HATCHet</strong></td>
+<td style="text-align: left;">Zaccaria &amp; Raphael, <em>Nat Commun</em> 2020 <a href="https://doi.org/10.1038/s41467-020-17967-y">DOI</a></td>
+<td style="text-align: left;">CN-centric</td>
+<td style="text-align: left;">Jointly infers allele- and clone-specific CN across samples by clustering depth ratio and BAF; needs multi-sample WGS (or WES) BAMs.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">41</td>
+<td style="text-align: left;"><strong>SVclone</strong></td>
+<td style="text-align: left;">Cmero et al., <em>Nat Commun</em> 2020 <a href="https://doi.org/10.1038/s41467-020-14351-8">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Estimates the CCF and copy number of SV breakpoints from both breakends; needs WGS BAMs, SV calls and CN.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">42</td>
+<td style="text-align: left;"><strong>TrackSig</strong></td>
+<td style="text-align: left;">Rubanova et al., <em>Nat Commun</em> 2020 <a href="https://doi.org/10.1038/s41467-020-14352-7">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Orders mutations by CN-corrected CCF and detects changes in mutational-signature activity along that order; needs WGS SNVs with CN and purity.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">43</td>
+<td style="text-align: left;"><strong>msphy-SCNAClonal</strong></td>
+<td style="text-align: left;">Chu, Nie &amp; Wang, <em>Front Genet</em> 2020 <a href="https://doi.org/10.3389/fgene.2019.01374">DOI</a></td>
+<td style="text-align: left;">CN-centric</td>
+<td style="text-align: left;">Subclonal reconstruction of somatic CN alterations with read-count-ratio bias correction and false-breakpoint filtering; needs tumor/normal NGS data.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">44</td>
+<td style="text-align: left;"><strong>DeCiFer</strong></td>
+<td style="text-align: left;">Satas et al., <em>Cell Syst</em> 2021 <a href="https://doi.org/10.1016/j.cels.2021.07.006">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Clusters SNVs by descendant cell fraction, explicitly modeling SNVs gained or lost through CNAs, jointly across samples; needs multi-sample counts and allele-specific CN.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">45</td>
+<td style="text-align: left;"><strong>CloneSig</strong></td>
+<td style="text-align: left;">Abécassis et al., <em>Nat Commun</em> 2021 <a href="https://doi.org/10.1038/s41467-021-24992-y">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Joint model of subclonal clustering and mutational signatures, with signature exposures specific to each clone; needs SNVs with sequence context plus CN and purity.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">46</td>
+<td style="text-align: left;"><strong>SubMARine</strong></td>
+<td style="text-align: left;">Sundermann et al., <em>PLoS Comput Biol</em> 2021 <a href="https://doi.org/10.1371/journal.pcbi.1008400">DOI</a></td>
+<td style="text-align: left;">Yes (extension)</td>
+<td style="text-align: left;">Polynomial-time partial clone tree summarizing all valid trees, with an extension for subclonal CNAs; needs pre-clustered subclone frequencies.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">47</td>
+<td style="text-align: left;"><strong>CRUST</strong></td>
+<td style="text-align: left;">Chattopadhyay et al., <em>Brief Bioinform</em> 2021 <a href="https://doi.org/10.1093/bib/bbab292">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Semi-supervised multi-sample deconvolution with purity normalization and CN adjustment, able to estimate CN itself if none is supplied; works at about 50x.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">48</td>
+<td style="text-align: left;"><strong>DEVOLUTION</strong></td>
+<td style="text-align: left;">Andersson et al., <em>Commun Biol</em> 2021 <a href="https://doi.org/10.1038/s42003-021-02637-6">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Subclonal deconvolution followed by phylogeny reconstruction that integrates copy number and sequencing information across tumor regions, provided each mutation’s mutated clone fraction is known; accepts SNP-array, WES, WGS or targeted data.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">49</td>
+<td style="text-align: left;"><strong>Unnamed AML method</strong></td>
+<td style="text-align: left;">Stiehl &amp; Marciniak-Czochra, <em>Front Physiol</em> 2021 <a href="https://doi.org/10.3389/fphys.2021.596194">DOI</a></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Enumerates all clonal hierarchies compatible with the bulk VAFs of one sample; needs VAFs only.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">50</td>
+<td style="text-align: left;"><strong>HDP bulk+single-cell model</strong></td>
+<td style="text-align: left;">He et al., <em>Ann Appl Stat</em> 2021 <a href="https://doi.org/10.1214/20-aoas1434">DOI</a></td>
+<td style="text-align: left;">Not stated</td>
+<td style="text-align: left;">Hierarchical Dirichlet process mixture with Gibbs sampling for structured bulk and single-cell sampling designs; needs both data types.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">51</td>
+<td style="text-align: left;"><strong>Pairtree</strong></td>
+<td style="text-align: left;">Wintersinger et al., <em>Blood Cancer Discov</em> 2022 <a href="https://doi.org/10.1158/2643-3230.BCD-21-0092">DOI</a></td>
+<td style="text-align: left;">Yes (via ω)</td>
+<td style="text-align: left;">Computes pairwise relations between mutation clusters, then samples trees by MCMC, for many samples; needs counts plus a CN-derived variant read probability (ω) per mutation.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">52</td>
+<td style="text-align: left;"><strong>PICTograph</strong></td>
+<td style="text-align: left;">Zheng et al., <em>Bioinformatics</em> 2022 <a href="https://doi.org/10.1093/bioinformatics/btac367">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Bayesian (JAGS) model integrating over tree space using CN-adjusted CCFs; needs SNV counts, CN and purity.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">53</td>
+<td style="text-align: left;"><strong>MEDICC2</strong></td>
+<td style="text-align: left;">Kaufmann et al., <em>Genome Biol</em> 2022 <a href="https://doi.org/10.1186/s13059-022-02794-9">DOI</a></td>
+<td style="text-align: left;">CN-centric</td>
+<td style="text-align: left;">Minimum-event distance phylogenies from allele-specific CN profiles, including whole-genome doubling; needs allele-specific CN segments.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">54</td>
+<td style="text-align: left;"><strong>MAGOS</strong></td>
+<td style="text-align: left;">Ahmadinejad et al., <em>Mol Biol Evol</em> 2022 <a href="https://doi.org/10.1093/molbev/msac136">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Clustering error model accounting for how VAF variance depends on depth and mean VAF, working down to about 30x; accepts SNVs and CNVs from one or more samples.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">55</td>
+<td style="text-align: left;"><strong>cfdna-wgs</strong></td>
+<td style="text-align: left;">Herberts et al., <em>Nature</em> 2022 <a href="https://doi.org/10.1038/s41586-022-04975-9">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">K-means-based clustering of CN-corrected mutation fractions from deep ctDNA WGS; needs SNV counts, CN and ctDNA fraction.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">56</td>
+<td style="text-align: left;"><strong>CONIPHER</strong></td>
+<td style="text-align: left;">Grigoriadis et al., <em>Nat Protoc</em> 2024 <a href="https://doi.org/10.1038/s41596-023-00913-9">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">TRACERx framework combining CN-aware clustering, error correction (including mutation loss) and multi-sample tree building; needs multi-region counts, allele-specific CN and purity.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">57</td>
+<td style="text-align: left;"><strong>Orchard</strong></td>
+<td style="text-align: left;">Kulman et al., <em>PLoS Comput Biol</em> 2024 <a href="https://doi.org/10.1371/journal.pcbi.1012653">DOI</a></td>
+<td style="text-align: left;">Yes (via ω)</td>
+<td style="text-align: left;">Stochastic combinatorial search for large phylogenies, the successor to Pairtree; same inputs as Pairtree.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">58</td>
+<td style="text-align: left;"><strong>RETCHER</strong></td>
+<td style="text-align: left;">Wang et al., <em>Brief Bioinform</em> 2024 <a href="https://doi.org/10.1093/bib/bbae516">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Identifies the number of mutated copies of each SNV under CN changes to correct CCFs, assesses how credible each cluster is, and infers phylogenies; needs multi-sample SNV and CN data.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">59</td>
+<td style="text-align: left;"><strong>PhyClone</strong></td>
+<td style="text-align: left;">Hurtado, Bouchard-Côté &amp; Roth, <em>Bioinformatics</em> 2025 <a href="https://doi.org/10.1093/bioinformatics/btaf344">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Bayesian sampler over phylogenies (forest-structured Chinese restaurant process with particle Gibbs) that models mutation loss and outliers; needs allele-specific CN and counts from one or more samples.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">60</td>
+<td style="text-align: left;"><strong>MyClone</strong></td>
+<td style="text-align: left;">Guo et al., <em>BMC Bioinformatics</em> 2025 <a href="https://doi.org/10.1186/s12859-025-06252-8">DOI</a></td>
+<td style="text-align: left;">Yes (heuristic)</td>
+<td style="text-align: left;">Variational-EM clustering of copy-neutral mutations, then reassignment of CNA-affected mutations to those clones by matching possible genotypes; designed for deep (around 2,000x) targeted or ctDNA data and weaker at WES/WGS depth.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">61</td>
+<td style="text-align: left;"><strong>Sapling</strong></td>
+<td style="text-align: left;">Qi, Schmidt &amp; El-Kebir, <em>Algorithms Mol Biol</em> 2026 <a href="https://doi.org/10.1186/s13015-025-00295-5">DOI</a></td>
+<td style="text-align: left;">Not stated</td>
+<td style="text-align: left;">Infers a small set of backbone trees that summarize the space of plausible phylogenies from bulk read counts, and can also infer full trees.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">62</td>
+<td style="text-align: left;"><strong>CliPP</strong> <em>(preprint, not peer-reviewed)</em></td>
+<td style="text-align: left;">Jiang et al., <em>bioRxiv</em> 2021, updated 2026 <a href="https://doi.org/10.1101/2021.03.31.437383">DOI</a></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Penalized-likelihood (pairwise fusion) clustering of cellular prevalences that needs no extensive priors; takes WGS/WES variant calls with read depth, allele counts and copy-number segments.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">63</td>
+<td style="text-align: left;"><em>Benchmark:</em> <strong>Tanner et al.</strong></td>
+<td style="text-align: left;"><em>Nat Commun</em> 2021 <a href="https://doi.org/10.1038/s41467-021-26698-7">DOI</a></td>
+<td style="text-align: left;">n/a</td>
+<td style="text-align: left;">Benchmarked complete pipelines on 80 simulated bulk WES datasets; Mutect2, then FACETS, then PyClone-VI was the best combination, and purity and purity-corrected depth drove accuracy.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">64</td>
+<td style="text-align: left;"><em>Benchmark:</em> <strong>ICGC-TCGA DREAM Challenge (Salcedo et al.)</strong></td>
+<td style="text-align: left;"><em>Nat Biotechnol</em> 2024 <a href="https://doi.org/10.1038/s41587-024-02250-y">DOI</a></td>
+<td style="text-align: left;">n/a</td>
+<td style="text-align: left;">Benchmarked 31 single-sample subclonal reconstruction algorithms on 51 simulated tumors across seven tasks; no single method won all tasks, and CN state, purity-adjusted depth and mappability affected performance.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="feasibility-of-subclone-detection" class="level2">
+<h2 class="anchored" data-anchor-id="feasibility-of-subclone-detection">2. Feasibility of subclone detection</h2>
+<p>Whether a subclone can be detected depends on tumor purity, the fraction of tumor cells in the subclone, sequencing depth, and how many mutations the subclone carries. For a single sample, the tables estimate whether a subclone separates from the clonal (trunk) mutations as its own cluster, and roughly how many mutations it needs.</p>
+<p>All values come from the model in Section 3, with these definitions:</p>
+<ul>
+<li>Expected VAF, for a heterozygous mutation in a diploid region, is <span class="math inline">\(VAF = Purity \times CCF / 2\)</span>.</li>
+<li>Separation score (<span class="math inline">\(S\)</span>) is the distance between the trunk and subclone VAFs divided by their combined binomial standard deviation at the stated depth (Section 3A).</li>
+<li>Retained is the fraction of the subclone’s true mutations expected to pass a caller filter of <span class="math inline">\(\ge 4\)</span> alternate reads, calculated from the binomial distribution.</li>
+<li>Feasible is <em>No</em> if <span class="math inline">\(S &lt; 1.5\)</span> or fewer than 20% of the subclone’s mutations are retained, <em>Marginal</em> if <span class="math inline">\(1.5 \le S &lt; 2\)</span>, and <em>Yes</em> if <span class="math inline">\(S \ge 2\)</span>.</li>
+<li>Biological mutations needed is a rough count of the detected mutations a mixture model needs before it opens a separate cluster (10-15 for <span class="math inline">\(S \ge 4\)</span>, 20-30 for <span class="math inline">\(3 \le S &lt; 4\)</span>, 40-60 for <span class="math inline">\(2 \le S &lt; 3\)</span>, and 100 or more for marginal cases), divided by the retained fraction and rounded to the nearest 5.</li>
+</ul>
+<p>These are best-case estimates. They assume heterozygous mutations in diploid regions, the same depth at every site, known purity, pure binomial noise, and a single subclone alongside the trunk. Real data are harder. Exome coverage varies widely between sites, overdispersion widens VAF distributions (Section 3B), retained mutations are biased toward higher VAF (Section 3C), and copy-number changes, purity errors and the neutral tail can create or hide clusters (Section 4). The mutation counts are rules of thumb, not the result of a formal power calculation. To estimate power for a specific study design, simulate data and run it through the pipeline you plan to use.</p>
+<section id="x-typical-wes" class="level3">
+<h3 class="anchored" data-anchor-id="x-typical-wes">100x (typical WES)</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Tumor Purity</th>
+<th style="text-align: left;">Subclone Fraction</th>
+<th style="text-align: left;">Expected VAFs (Trunk / Subclone)</th>
+<th style="text-align: left;">Separation Score</th>
+<th style="text-align: left;">Subclonal Mutations Retained (≥4 alt reads)</th>
+<th style="text-align: left;">Feasible?</th>
+<th style="text-align: left;">Biological Mutations Needed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>10%</strong></td>
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;">5.0% / 1.0%</td>
+<td style="text-align: left;">1.67</td>
+<td style="text-align: left;">2%</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">N/A</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>10%</strong></td>
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;">5.0% / 2.0%</td>
+<td style="text-align: left;">1.16</td>
+<td style="text-align: left;">14%</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">N/A</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>10%</strong></td>
+<td style="text-align: left;"><strong>60%</strong></td>
+<td style="text-align: left;">5.0% / 3.0%</td>
+<td style="text-align: left;">0.72</td>
+<td style="text-align: left;">35%</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">N/A</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;">10.0% / 2.0%</td>
+<td style="text-align: left;">2.42</td>
+<td style="text-align: left;">14%</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">N/A</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;">10.0% / 4.0%</td>
+<td style="text-align: left;">1.67</td>
+<td style="text-align: left;">57%</td>
+<td style="text-align: left;">Marginal</td>
+<td style="text-align: left;">&gt;175</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;"><strong>60%</strong></td>
+<td style="text-align: left;">10.0% / 6.0%</td>
+<td style="text-align: left;">1.05</td>
+<td style="text-align: left;">86%</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">N/A</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>30%</strong></td>
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;">15.0% / 3.0%</td>
+<td style="text-align: left;">3.03</td>
+<td style="text-align: left;">35%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈55-85</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>30%</strong></td>
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;">15.0% / 6.0%</td>
+<td style="text-align: left;">2.10</td>
+<td style="text-align: left;">86%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈45-70</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>30%</strong></td>
+<td style="text-align: left;"><strong>60%</strong></td>
+<td style="text-align: left;">15.0% / 9.0%</td>
+<td style="text-align: left;">1.31</td>
+<td style="text-align: left;">98%</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">N/A</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;">20.0% / 4.0%</td>
+<td style="text-align: left;">3.59</td>
+<td style="text-align: left;">57%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈35-55</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;">20.0% / 8.0%</td>
+<td style="text-align: left;">2.48</td>
+<td style="text-align: left;">96%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈40-60</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;"><strong>60%</strong></td>
+<td style="text-align: left;">20.0% / 12.0%</td>
+<td style="text-align: left;">1.55</td>
+<td style="text-align: left;">100%</td>
+<td style="text-align: left;">Marginal</td>
+<td style="text-align: left;">&gt;100</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>50%</strong></td>
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;">25.0% / 5.0%</td>
+<td style="text-align: left;">4.13</td>
+<td style="text-align: left;">74%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈15-20</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>50%</strong></td>
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;">25.0% / 10.0%</td>
+<td style="text-align: left;">2.85</td>
+<td style="text-align: left;">99%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈40-60</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>50%</strong></td>
+<td style="text-align: left;"><strong>60%</strong></td>
+<td style="text-align: left;">25.0% / 15.0%</td>
+<td style="text-align: left;">1.78</td>
+<td style="text-align: left;">100%</td>
+<td style="text-align: left;">Marginal</td>
+<td style="text-align: left;">&gt;100</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="x-deep-wes" class="level3">
+<h3 class="anchored" data-anchor-id="x-deep-wes">200x (deep WES)</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Tumor Purity</th>
+<th style="text-align: left;">Subclone Fraction</th>
+<th style="text-align: left;">Expected VAFs (Trunk / Subclone)</th>
+<th style="text-align: left;">Separation Score</th>
+<th style="text-align: left;">Subclonal Mutations Retained (≥4 alt reads)</th>
+<th style="text-align: left;">Feasible?</th>
+<th style="text-align: left;">Biological Mutations Needed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>10%</strong></td>
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;">5.0% / 1.0%</td>
+<td style="text-align: left;">2.36</td>
+<td style="text-align: left;">14%</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">N/A</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>10%</strong></td>
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;">5.0% / 2.0%</td>
+<td style="text-align: left;">1.64</td>
+<td style="text-align: left;">57%</td>
+<td style="text-align: left;">Marginal</td>
+<td style="text-align: left;">&gt;175</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>10%</strong></td>
+<td style="text-align: left;"><strong>60%</strong></td>
+<td style="text-align: left;">5.0% / 3.0%</td>
+<td style="text-align: left;">1.02</td>
+<td style="text-align: left;">85%</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">N/A</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;">10.0% / 2.0%</td>
+<td style="text-align: left;">3.42</td>
+<td style="text-align: left;">57%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈35-55</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;">10.0% / 4.0%</td>
+<td style="text-align: left;">2.37</td>
+<td style="text-align: left;">96%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈40-60</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;"><strong>60%</strong></td>
+<td style="text-align: left;">10.0% / 6.0%</td>
+<td style="text-align: left;">1.48</td>
+<td style="text-align: left;">100%</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">N/A</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>30%</strong></td>
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;">15.0% / 3.0%</td>
+<td style="text-align: left;">4.29</td>
+<td style="text-align: left;">85%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈10-20</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>30%</strong></td>
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;">15.0% / 6.0%</td>
+<td style="text-align: left;">2.97</td>
+<td style="text-align: left;">100%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈40-60</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>30%</strong></td>
+<td style="text-align: left;"><strong>60%</strong></td>
+<td style="text-align: left;">15.0% / 9.0%</td>
+<td style="text-align: left;">1.85</td>
+<td style="text-align: left;">100%</td>
+<td style="text-align: left;">Marginal</td>
+<td style="text-align: left;">&gt;100</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;">20.0% / 4.0%</td>
+<td style="text-align: left;">5.08</td>
+<td style="text-align: left;">96%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈10-15</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;">20.0% / 8.0%</td>
+<td style="text-align: left;">3.51</td>
+<td style="text-align: left;">100%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈20-30</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;"><strong>60%</strong></td>
+<td style="text-align: left;">20.0% / 12.0%</td>
+<td style="text-align: left;">2.20</td>
+<td style="text-align: left;">100%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈40-60</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>50%</strong></td>
+<td style="text-align: left;"><strong>20%</strong></td>
+<td style="text-align: left;">25.0% / 5.0%</td>
+<td style="text-align: left;">5.83</td>
+<td style="text-align: left;">99%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈10-15</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>50%</strong></td>
+<td style="text-align: left;"><strong>40%</strong></td>
+<td style="text-align: left;">25.0% / 10.0%</td>
+<td style="text-align: left;">4.03</td>
+<td style="text-align: left;">100%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈10-15</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>50%</strong></td>
+<td style="text-align: left;"><strong>60%</strong></td>
+<td style="text-align: left;">25.0% / 15.0%</td>
+<td style="text-align: left;">2.52</td>
+<td style="text-align: left;">100%</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">≈40-60</td>
+</tr>
+</tbody>
+</table>
+<p>A subclone present in 60% of tumor cells is often harder to detect than one present in 40%, because its VAF sits close to the trunk peak. At low purity the limit shifts from peak overlap to variant-caller attrition: at 10% purity, most subclonal mutations never reach the clustering step. For WGS at 30-60x, separation scores are roughly <span class="math inline">\(\sqrt{100/N}\)</span> times those in the 100x table (about 0.7 times at 50x), so a single WGS sample can resolve only well-separated subclones in high-purity tumors. WGS partly makes up for this by detecting far more mutations.</p>
+</section>
+</section>
+<section id="statistical-model-of-subclone-detection" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-model-of-subclone-detection">3. Statistical model of subclone detection</h2>
+<p>The numbers in Section 2 depend on the binomial spread of each mutation’s VAF, on sequencing noise beyond the binomial, and on the loss of low-VAF mutations before clustering. They also depend on how clustering models decide how many clusters to report.</p>
+<section id="a.-binomial-variance-and-peak-separation-deltavaf" class="level3">
+<h3 class="anchored" data-anchor-id="a.-binomial-variance-and-peak-separation-deltavaf">A. Binomial variance and peak separation (<span class="math inline">\(\Delta\)</span>VAF)</h3>
+<p>Tools model the variant read count at each site (<span class="math inline">\(v_i\)</span>) against its total depth (<span class="math inline">\(N_i\)</span>). For a heterozygous mutation in a diploid region, the expected VAF (<span class="math inline">\(p_i\)</span>) is: <span class="math display">\[p_i = \frac{Purity \times CCF_i}{2}\]</span> where <span class="math inline">\(CCF_i\)</span> is the cancer cell fraction, the fraction of tumor cells carrying the mutation. Section 4A gives the formula for other copy-number states.</p>
+<p>Reads are a random sample, so the variant read count follows a binomial distribution, <span class="math inline">\(v_i \sim \text{Binomial}(N_i, p_i)\)</span>, and the standard deviation (<span class="math inline">\(\sigma\)</span>) of a single mutation’s observed VAF is: <span class="math display">\[\sigma = \sqrt{\frac{p_i(1-p_i)}{N_i}}\]</span></p>
+<p>The separation score divides the distance between the expected VAFs of two clusters by their combined spread: <span class="math display">\[S = \frac{|VAF_{trunk} - VAF_{subclone}|}{\sqrt{\sigma_{trunk}^2 + \sigma_{subclone}^2}}\]</span> Above about 4 the clusters separate cleanly, and 10-15 detected mutations are usually enough. Between 2 and 4 the distributions partly overlap and more mutations are needed. Below about 2 the combined histogram usually shows a single peak.</p>
+<p><span class="math inline">\(N_i\)</span> is the depth at each site, and exome coverage is uneven, so many sites are sequenced well below the mean and the real separation is lower than the score at mean depth suggests. In the benchmark by Tanner et al.&nbsp;(<em>Nat Commun</em> 2021, <a href="https://doi.org/10.1038/s41467-021-26698-7">DOI</a>), purity-corrected depth was one of the strongest predictors of accuracy. A low score does not make separation impossible, though. With <span class="math inline">\(n\)</span> mutations in a cluster, the standard error of the cluster’s mean VAF is roughly <span class="math inline">\(\sigma/\sqrt{n}\)</span>, so a mixture model can still resolve overlapping clusters if there are enough mutations. It does mean that many individual mutations will be assigned to the wrong cluster, and that the number of mutations needed rises steeply.</p>
+</section>
+<section id="b.-beta-binomial-sequencing-noise" class="level3">
+<h3 class="anchored" data-anchor-id="b.-beta-binomial-sequencing-noise">B. Beta-binomial sequencing noise</h3>
+<p>Real sequencing data vary more than the binomial model predicts, which is called overdispersion. Causes include PCR duplicates and amplification bias, differences in capture efficiency between baits, reference bias against the alternate allele during mapping, and local copy-number heterogeneity that the segmentation misses. Several tools, including PyClone and PyClone-VI, offer a beta-binomial likelihood with a precision (overdispersion) parameter to absorb it: <span class="math display">\[v_i \sim \text{Beta-Binomial}(N_i, p_i, \rho)\]</span> Overdispersion widens each cluster, lowers the effective separation score and raises the number of mutations needed. Fitting a pure binomial model to overdispersed data carries the opposite risk: it tends to split one real cluster into several spurious ones.</p>
+</section>
+<section id="c.-variant-caller-attrition-and-detection-bias" class="level3">
+<h3 class="anchored" data-anchor-id="c.-variant-caller-attrition-and-detection-bias">C. Variant caller attrition and detection bias</h3>
+<p>The somatic caller decides which mutations reach the clustering step. Mutect2 has no hard minimum number of alternate reads by default (it uses a likelihood-based score), but many pipelines add a minimum of 3-5 alternate reads, and every caller has low sensitivity when only a few reads support a variant. With a cutoff of <span class="math inline">\(\ge 4\)</span> alternate reads at 100x depth, the binomial model predicts the loss of about 14% of true mutations at 6% VAF (a mean of 6 alternate reads), 26% at 5% VAF, 43% at 4% VAF and 86% at 2% VAF.</p>
+<p>The surviving mutations are also biased. They are the ones that happened to receive extra alternate reads, so the observed VAFs of a subclone near the detection limit are too high. The subclone moves toward the trunk, the gap between them narrows, and the subclone’s CCF is overestimated. In multi-sample studies, force-call (genotype) the union of all mutations in every sample and record read counts even where a site was not called, because a mutation that was not called in a sample may still be present in it.</p>
+</section>
+<section id="d.-model-complexity-and-cluster-number" class="level3">
+<h3 class="anchored" data-anchor-id="d.-model-complexity-and-cluster-number">D. Model complexity and cluster number</h3>
+<p>Every clustering method penalizes complexity in some way when it decides how many clusters the data support. Dirichlet-process models (PyClone, DPClust, PhyloWGS) use a concentration parameter that controls how readily a new cluster opens. Variational methods such as PyClone-VI fit a mixture with a sparsity-inducing prior and drop empty components. Others use BIC (QuantumClone) or a penalized likelihood (CliPP). Under all of these schemes, a few mutations at an intermediate VAF are cheaper to explain as noise around an existing cluster than as a new population, so a subclone is reported only once it has enough detected mutations. Because these settings can be tuned, results can change with the priors, the concentration parameter and even the random seed. Report the settings, and check that the inferred structure is stable across runs.</p>
+</section>
+</section>
+<section id="complications-in-real-data" class="level2">
+<h2 class="anchored" data-anchor-id="complications-in-real-data">4. Complications in real data</h2>
+<p>The feasibility analysis assumes diploid, heterozygous mutations and correct purity. Four further issues decide whether an inferred subclonal structure is real.</p>
+<section id="a.-copy-number-effects" class="level3">
+<h3 class="anchored" data-anchor-id="a.-copy-number-effects">A. Copy-number effects</h3>
+<p>Most solid tumors are aneuploid, and copy number changes how VAF relates to CCF. For a mutation present on <span class="math inline">\(m\)</span> copies (its multiplicity) at a locus with total tumor copy number <span class="math inline">\(CN_t\)</span>, and a normal copy number of 2: <span class="math display">\[VAF = \frac{Purity \times m \times CCF}{Purity \times CN_t + 2(1 - Purity)}\]</span></p>
+<p>The table gives the expected VAF of a clonal mutation (CCF = 1) at 50% purity in several copy-number states, and the CCF that a naive diploid conversion (<span class="math inline">\(CCF = 2 \times VAF / Purity\)</span>) would report:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Copy-number state at locus</th>
+<th style="text-align: left;"><span class="math inline">\(CN_t\)</span></th>
+<th style="text-align: left;">Multiplicity <span class="math inline">\(m\)</span></th>
+<th style="text-align: left;">Expected VAF</th>
+<th style="text-align: left;">Naive diploid CCF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Diploid, heterozygous</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">25.0%</td>
+<td style="text-align: left;">1.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Copy-neutral LOH (mutation duplicated)</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">50.0%</td>
+<td style="text-align: left;">2.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Single-copy deletion of the other allele</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">33.3%</td>
+<td style="text-align: left;">1.33</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Single-copy gain, mutation not on gained allele</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">20.0%</td>
+<td style="text-align: left;">0.80</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Single-copy gain, mutation on gained allele</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">40.0%</td>
+<td style="text-align: left;">1.60</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">After whole-genome doubling, mutation post-doubling</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">16.7%</td>
+<td style="text-align: left;">0.67</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">After whole-genome doubling, mutation pre-doubling</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">33.3%</td>
+<td style="text-align: left;">1.33</td>
+</tr>
+</tbody>
+</table>
+<p>Every row is a clonal mutation, but a diploid model would put the last six rows at five different wrong CCFs. In a genome-doubled tumor, mutations acquired after the doubling form a large, tight cluster at half the VAF of those acquired before it, and a diploid model reports them as a subclone at CCF 0.67. Genome doubling is common, so this artifact is too. CNA-aware tools are needed whenever a substantial fraction of mutations lies outside diploid regions.</p>
+<p>Multiplicity is not observed, so CNA-aware tools have to infer <span class="math inline">\(m\)</span> for each mutation. PyClone integrates over the possible genotypes, while other tools pick the most likely multiplicity. When <span class="math inline">\(CN_t &gt; 2\)</span>, mutations with different multiplicities and CCFs can produce the same VAF, so some ambiguity remains even when the copy number is correct.</p>
+<p>A CNA present in only some tumor cells makes the local copy number a mixture. A mutation’s CCF then depends on whether it arose before or after the CNA, and in which lineage. Only some tools, such as PhyloWGS, Canopy, SPRUCE and DeCiFer, model this; others require subclonal CNA regions to be excluded.</p>
+<p>A deletion can also remove the allele carrying a mutation in a descendant lineage, so a clonal mutation looks subclonal or disappears from one region of a multi-region study. This breaks the infinite-sites assumption behind most tree-building methods. CONIPHER, PhyClone, DeCiFer and SPRUCE allow for mutation loss. With other tools, treat mutations in regions with subclonal losses with caution.</p>
+<p>MOBSTER analyzes mutations separately by karyotype (for example 1:1, 2:1 and 2:2), and the same split makes a good quality check: in each karyotype, the clonal cluster should sit where theory predicts.</p>
+</section>
+<section id="b.-upstream-errors-in-purity-ploidy-and-copy-number-calls" class="level3">
+<h3 class="anchored" data-anchor-id="b.-upstream-errors-in-purity-ploidy-and-copy-number-calls">B. Upstream errors in purity, ploidy and copy-number calls</h3>
+<p>Every CCF depends on the purity and copy-number estimates supplied as input, so an upstream error affects every mutation.</p>
+<p>Purity and ploidy are often ambiguous. A copy-number caller can fit the same data almost equally well with different combinations, such as a near-diploid tumor at one purity and a near-tetraploid tumor at another. Picking the wrong solution rescales every CCF and can create or remove whole clusters. Smaller purity errors move the clonal peak. If purity is underestimated, clonal mutations appear to have CCFs above 1; if it is overestimated, they appear subclonal and may be reported as a large subclone.</p>
+<p>Copy-number calls from WES are noisier than calls from WGS. Off-target reads, uneven capture and fewer heterozygous SNPs make segmentation and allele-specific calls less reliable from exomes. In the Tanner et al.&nbsp;WES benchmark, the best pipeline combined Mutect2, FACETS and PyClone-VI, so the choice of copy-number caller mattered. Other sources of error include tumor cells contaminating the matched normal (which removes true mutations or lowers their VAFs), poorly mappable or repetitive regions, sex chromosomes, and segmentation errors near breakpoints.</p>
+<p>In the ICGC-TCGA DREAM benchmark (Salcedo et al., <em>Nat Biotechnol</em> 2024, <a href="https://doi.org/10.1038/s41587-024-02250-y">DOI</a>), copy-number state, purity-adjusted depth and read mappability affected the performance of most methods. Before clustering, confirm that the clonal mutation peak lies at CCF ≈ 1 in each major karyotype. Compare purity estimates from at least two independent methods (such as ABSOLUTE, ASCAT, FACETS or Sequenza) with the purity implied by the mutation VAFs, and look at VAF histograms for each copy-number state. A quality-control tool such as CNAqc (Antonello et al., <em>Genome Biol</em> 2024) tests whether the copy-number calls and mutation VAFs agree.</p>
+</section>
+<section id="c.-the-neutral-tail" class="level3">
+<h3 class="anchored" data-anchor-id="c.-the-neutral-tail">C. The neutral tail</h3>
+<p>Cells in every expanding clone keep acquiring new mutations, each carried by a small fraction of cells. Under neutral growth these form a long tail of low-frequency mutations whose number keeps rising toward lower VAF. The tail follows a power law, with the cumulative number of mutations above frequency <span class="math inline">\(f\)</span> roughly proportional to <span class="math inline">\(1/f\)</span>. It is real biology, but it does not correspond to a distinct subpopulation.</p>
+<p>Standard mixture models assume every mutation belongs to a discrete cluster, so they tend to fit the tail with one or more spurious low-CCF subclones. Deep WGS makes this worse because it detects many tail mutations, and the caller’s detection limit cuts the tail off so that it looks like a hump just above the threshold. MOBSTER (Caravagna et al., <em>Nat Genet</em> 2020, <a href="https://doi.org/10.1038/s41588-020-0675-5">DOI</a>) models the tail as a Pareto component alongside beta-distributed clusters. Its authors showed that ignoring the tail causes systematic errors, especially across multiple samples. Treat the lowest-CCF cluster in any analysis as suspect until other evidence supports it, particularly if it sits just above the detection limit.</p>
+</section>
+<section id="d.-multi-region-and-longitudinal-sampling" class="level3">
+<h3 class="anchored" data-anchor-id="d.-multi-region-and-longitudinal-sampling">D. Multi-region and longitudinal sampling</h3>
+<p>A single bulk sample can only separate subclones whose CCFs differ in that sample. Two distinct subclones with similar prevalence in one region merge into one cluster, and one sample usually cannot tell a linear tree from a branching one. With several regions or time points, each mutation has a vector of CCFs, and clusters that overlap in one sample are often well separated in another. Multi-sample data also reveal region-specific subclones and constrain the tree topology much more tightly.</p>
+<p>Sequencing several samples at standard depth can therefore be more informative than sequencing one sample very deeply. The MAGOS authors (Ahmadinejad et al., <em>Mol Biol Evol</em> 2022, <a href="https://doi.org/10.1093/molbev/msac136">DOI</a>) made this case on cost grounds.</p>
+<p>Multi-region designs have their own requirements. Force-call every mutation in every sample (Section 3C), so that a missing mutation reflects biology rather than detection limits. Estimate purity and copy number separately for each sample, since both often differ between regions. Use methods built for multiple samples, such as PyClone-VI, DPClust, Pairtree, CONIPHER, PhyClone or DeCiFer. Watch for sampling bias too: a mutation that is clonal in every sampled region may still be subclonal in the tumor as a whole (the “illusion of clonality”), and low-purity regions add little information.</p>
+</section>
+</section>
+<section id="intuitive-guide-for-bioinformaticians" class="level2">
+<h2 class="anchored" data-anchor-id="intuitive-guide-for-bioinformaticians">5. Intuitive guide for bioinformaticians</h2>
+<p><em>This section explains the ideas above without the statistics, and what they mean for your pipeline.</em></p>
+<section id="coverage-is-focus-the-blurry-eye-chart" class="level3">
+<h3 class="anchored" data-anchor-id="coverage-is-focus-the-blurry-eye-chart">1. Coverage is focus: the blurry eye chart</h3>
+<p>Think of a histogram of your VAFs as an eye chart. The trunk clone is a large letter at the top, the subclone a smaller letter further down, and sequencing depth is your glasses. At 40x WGS the glasses are poor. Every mutation’s VAF is blurred across the chart, and if the trunk and subclone are close together their blur merges into one blob. The algorithm cannot sharpen the image: if you cannot see two humps in the histogram, the clustering tool will usually report one clone. At 200x or 300x the glasses are strong, mutations sit close to their true VAFs, the overlap shrinks, and the algorithm can separate the two groups. The depth that counts is the depth at each site after allowing for purity. A tumor at 30% purity sequenced at 200x carries as much tumor information as a pure tumor at 60x.</p>
+</section>
+<section id="why-a-subclone-needs-enough-mutations" class="level3">
+<h3 class="anchored" data-anchor-id="why-a-subclone-needs-enough-mutations">2. Why a subclone needs enough mutations</h3>
+<p>Clustering tools follow a form of Occam’s razor and prefer the simplest explanation. Given a large peak of 100 mutations at 25% VAF and three stray mutations at 10%, the algorithm effectively asks: <em>“Is it more likely that a separate population of cancer cells exists just for these three mutations, or that these are noisy reads of the main tumor?”</em> It almost always picks the second answer. Depending on how far the subclone sits from the trunk, it typically needs from about 10 to more than 50 detected mutations before the algorithm accepts it. These settings can be tuned, so check that your result does not depend on a particular prior or random seed.</p>
+</section>
+<section id="the-death-valley-of-variant-callers" class="level3">
+<h3 class="anchored" data-anchor-id="the-death-valley-of-variant-callers">3. The “Death Valley” of variant callers</h3>
+<p>Variant callers are built to avoid false positives, and most pipelines discard mutations with only a few supporting reads, so the caller can remove much of a subclone before clustering starts. If your subclone sits at 6% VAF and average depth is 100x, a typical subclonal mutation has 6 variant reads, and about 1 in 7 will fall below a 4-read cutoff by chance. At 4% VAF almost half are lost, and at 2% nearly all. The survivors are the ones that happened to get extra reads, so the subclone also looks closer to the trunk than it really is. If the clustering tool needs 20 detected mutations to accept a subclone at 4% VAF, the subclone must carry about 35-40 real mutations for enough of them to survive.</p>
+</section>
+<section id="copy-number-moves-the-humps" class="level3">
+<h3 class="anchored" data-anchor-id="copy-number-moves-the-humps">4. Copy number moves the humps</h3>
+<p>A mutation’s VAF depends on how many cells carry it, how many copies of the chromosome those cells have, and how many of those copies carry the mutation. In a genome-doubled tumor, clonal mutations form two humps, one at half the VAF of the other, and a diploid model calls the lower hump a subclone. Before trusting a subclone, check which copy-number states its mutations come from. A “subclone” made up mostly of mutations from gained, lost or doubled regions is very likely a copy-number artifact.</p>
+</section>
+<section id="purity-and-copy-number-errors-carry-through" class="level3">
+<h3 class="anchored" data-anchor-id="purity-and-copy-number-errors-carry-through">5. Purity and copy-number errors carry through</h3>
+<p>Every CCF is calculated from the purity and copy-number estimates you supply. If purity is overestimated, the whole distribution shifts left and the clonal peak is reported as a large subclone. Check that the clonal peak lands at CCF ≈ 1 before you interpret anything below it.</p>
+</section>
+<section id="a-low-bump-is-not-always-a-subclone" class="level3">
+<h3 class="anchored" data-anchor-id="a-low-bump-is-not-always-a-subclone">6. A low bump is not always a subclone</h3>
+<p>Growing tumors constantly pick up private mutations carried by few cells. Deep sequencing detects them as a long low-VAF tail, which clustering tools tend to split off as a fake minor subclone, especially just above the caller’s detection limit. Treat the lowest cluster with suspicion, or use a tool such as MOBSTER that models the tail.</p>
+</section>
+<section id="more-samples-can-beat-more-depth" class="level3">
+<h3 class="anchored" data-anchor-id="more-samples-can-beat-more-depth">7. More samples can beat more depth</h3>
+<p>Two subclones that look identical in one biopsy often look different in another. If the budget allows, sequencing two or three regions at standard depth often reveals more structure than sequencing one region twice as deep, and it is the only reliable way to resolve branching evolution. Force-call all mutations in all samples so that a mutation that went undetected is not counted as absent.</p>
+</section>
+<section id="summary" class="level3">
+<h3 class="anchored" data-anchor-id="summary">Summary</h3>
+<p>Subclonal deconvolution can only find what the data support. With tumor purity below about 30% and standard 100x WES, only well-separated subclones that carry many mutations are detectable. Purer samples, deeper sequencing, more regions, and checked purity and copy-number calls improve results far more than a more sophisticated algorithm. Whatever tool you use, interpret its clusters in light of copy number, purity and the neutral tail before treating them as cell populations.</p>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
