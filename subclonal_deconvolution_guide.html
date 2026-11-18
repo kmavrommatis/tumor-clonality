@@ -68,8 +68,47 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<link href="https://jsdelivr.net" rel="stylesheet">
-<script src="https://jsdelivr.net"></script>
+<style>
+  table.sortable thead th { cursor: pointer; user-select: none; white-space: nowrap; }
+  table.sortable thead th::after { content: " \2195"; opacity: 0.35; font-size: 0.8em; }
+  table.sortable thead th.sort-asc::after { content: " \25B2"; opacity: 1; }
+  table.sortable thead th.sort-desc::after { content: " \25BC"; opacity: 1; }
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll("table.sortable").forEach(function (table) {
+    var tbody = table.tBodies[0];
+    if (!tbody) return;
+    var headers = table.querySelectorAll("thead th");
+    headers.forEach(function (th, col) {
+      th.addEventListener("click", function () {
+        var asc = !th.classList.contains("sort-asc");
+        headers.forEach(function (h) { h.classList.remove("sort-asc", "sort-desc"); });
+        th.classList.add(asc ? "sort-asc" : "sort-desc");
+
+        var text = function (row) {
+          return row.cells[col] ? row.cells[col].textContent.trim() : "";
+        };
+        var number = function (s) {
+          var v = parseFloat(s.replace(/,/g, ""));
+          return isNaN(v) ? null : v;
+        };
+
+        var rows = Array.from(tbody.rows);
+        rows.sort(function (a, b) {
+          var x = text(a), y = text(b);
+          var nx = number(x), ny = number(y);
+          var r = (nx !== null && ny !== null)
+            ? nx - ny
+            : x.localeCompare(y, undefined, { numeric: true, sensitivity: "base" });
+          return asc ? r : -r;
+        });
+        rows.forEach(function (row) { tbody.appendChild(row); });
+      });
+    });
+  });
+});
+</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -121,8 +160,12 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="https://github.com/kmavrommatis/tumor-clonality"> 
+    <a class="nav-link" href="./index.html"> 
 <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/kmavrommatis/tumor-clonality"> 
+<span class="menu-text">GitHub</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
