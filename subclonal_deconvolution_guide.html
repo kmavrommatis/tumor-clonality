@@ -259,6 +259,21 @@ window.Quarto = {
 <section id="subclonal-deconvolution-tools-and-how-they-handle-cnas" class="level2">
 <h2 class="anchored" data-anchor-id="subclonal-deconvolution-tools-and-how-they-handle-cnas">Subclonal deconvolution tools and how they handle CNAs</h2>
 <p>Restricting an analysis to diploid regions discards much of the genome, so the table records how each tool treats copy number. Tools are listed by year of publication, followed by CliPP (a widely used preprint) and two benchmark studies. In the CNA handling column, <em>Yes</em> means the tool models copy number when it estimates cancer cell fractions (CCFs) or builds trees; <em>CN-centric</em> means it infers subclones from copy-number profiles rather than from SNVs; <em>No</em> means it should be run only on copy-neutral regions; and <em>Not stated</em> means the original abstract does not say. Every DOI was checked against its PubMed record, except Cloe (<em>Ann Appl Stat</em>, not indexed in PubMed), whose DOI comes from the publisher. BayClone appeared in conference proceedings without a DOI, so it links to PubMed instead.</p>
+<div class="table-filter" style="margin: 0.5em 0 1em 0;">
+  <label for="publications-cna-filter"><strong>Filter by CNA handling:</strong></label>
+  <select id="publications-cna-filter">
+    <option value="">All</option>
+    <option value="Yes">Yes</option>
+    <option value="CN-centric">CN-centric</option>
+    <option value="Partial">Partial</option>
+    <option value="No">No</option>
+    <option value="Not stated">Not stated</option>
+    <option value="Inherited">Inherited</option>
+    <option value="n/a">n/a</option>
+  </select>
+  <span id="publications-count" style="margin-left: 1em;"></span>
+</div>
+<script src="publications-filter.js"></script>
 <table class="sortable caption-top table">
 <caption>List of publications</caption>
 <thead>
@@ -266,6 +281,7 @@ window.Quarto = {
 <th style="text-align: left;">#</th>
 <th style="text-align: left;">Tool</th>
 <th style="text-align: left;">Publication</th>
+<th style="text-align: left;">Year</th>
 <th style="text-align: left;">CNA handling</th>
 <th style="text-align: left;">Algorithm &amp; Requirements Summary</th>
 </tr>
@@ -275,6 +291,7 @@ window.Quarto = {
 <td style="text-align: left;">1</td>
 <td style="text-align: left;"><strong>ABSOLUTE</strong></td>
 <td style="text-align: left;">Carter et al., <em>Nat Biotechnol</em> 2012 <a href="https://doi.org/10.1038/nbt.2203">DOI</a></td>
+<td style="text-align: left;">2012</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Estimates purity and ploidy from segmented CN and SNV allele fractions, then converts each mutation to a CCF and calls it clonal or subclonal; needs CN segments and SNV counts.</td>
 </tr>
@@ -282,6 +299,7 @@ window.Quarto = {
 <td style="text-align: left;">2</td>
 <td style="text-align: left;"><strong>DPClust</strong> (+ Battenberg)</td>
 <td style="text-align: left;">Nik-Zainal et al., <em>Cell</em> 2012 <a href="https://doi.org/10.1016/j.cell.2012.04.023">DOI</a>; Bolli et al., <em>Nat Commun</em> 2014 <a href="https://doi.org/10.1038/ncomms3997">DOI</a></td>
+<td style="text-align: left;">2012</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Dirichlet-process clustering of CN- and purity-corrected CCFs, single or multi-sample; needs SNV counts plus subclonal CN and purity, typically from WGS.</td>
 </tr>
@@ -289,6 +307,7 @@ window.Quarto = {
 <td style="text-align: left;">3</td>
 <td style="text-align: left;"><strong>THetA / THetA2</strong></td>
 <td style="text-align: left;">Oesper et al., <em>Genome Biol</em> 2013 <a href="https://doi.org/10.1186/gb-2013-14-7-r80">DOI</a>; Oesper et al., <em>Bioinformatics</em> 2014 <a href="https://doi.org/10.1093/bioinformatics/btu651">DOI</a></td>
+<td style="text-align: left;">2013</td>
 <td style="text-align: left;">CN-centric</td>
 <td style="text-align: left;">Infers the mixture of tumor populations and their CN profiles from read depth, with THetA2 adding B-allele frequency (BAF) and WES support; needs tumor/normal depth and BAF.</td>
 </tr>
@@ -296,6 +315,7 @@ window.Quarto = {
 <td style="text-align: left;">4</td>
 <td style="text-align: left;"><strong>TrAp</strong></td>
 <td style="text-align: left;">Strino et al., <em>Nucleic Acids Res</em> 2013 <a href="https://doi.org/10.1093/nar/gkt641">DOI</a></td>
+<td style="text-align: left;">2013</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Solves for all subclonal trees consistent with aggregate mutation frequencies under sum constraints; needs cellular frequencies from one sample.</td>
 </tr>
@@ -303,6 +323,7 @@ window.Quarto = {
 <td style="text-align: left;">5</td>
 <td style="text-align: left;"><strong>PyClone</strong></td>
 <td style="text-align: left;">Roth et al., <em>Nat Methods</em> 2014 <a href="https://doi.org/10.1038/nmeth.2883">DOI</a></td>
+<td style="text-align: left;">2014</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Dirichlet-process beta-binomial MCMC that integrates over possible mutation genotypes given major/minor CN; needs ref/alt counts, allele-specific CN and purity, and supports multiple samples.</td>
 </tr>
@@ -310,6 +331,7 @@ window.Quarto = {
 <td style="text-align: left;">6</td>
 <td style="text-align: left;"><strong>SciClone</strong></td>
 <td style="text-align: left;">Miller et al., <em>PLoS Comput Biol</em> 2014 <a href="https://doi.org/10.1371/journal.pcbi.1003665">DOI</a></td>
+<td style="text-align: left;">2014</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Variational Bayesian beta/binomial mixture on VAFs from one or more samples; uses CN segments only to restrict analysis to copy-neutral, LOH-free regions.</td>
 </tr>
@@ -317,6 +339,7 @@ window.Quarto = {
 <td style="text-align: left;">7</td>
 <td style="text-align: left;"><strong>PhyloSub</strong></td>
 <td style="text-align: left;">Jiao et al., <em>BMC Bioinformatics</em> 2014 <a href="https://doi.org/10.1186/1471-2105-15-35">DOI</a></td>
+<td style="text-align: left;">2014</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Tree-structured stick-breaking prior with MCMC on VAF-derived frequencies (PhyloWGS’s predecessor); assumes diploid loci.</td>
 </tr>
@@ -324,6 +347,7 @@ window.Quarto = {
 <td style="text-align: left;">8</td>
 <td style="text-align: left;"><strong>Clomial</strong></td>
 <td style="text-align: left;">Zare et al., <em>PLoS Comput Biol</em> 2014 <a href="https://doi.org/10.1371/journal.pcbi.1003703">DOI</a></td>
+<td style="text-align: left;">2014</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Binomial latent-clone model fit by EM to multi-sample allele counts; assumes CN-neutral loci.</td>
 </tr>
@@ -331,6 +355,7 @@ window.Quarto = {
 <td style="text-align: left;">9</td>
 <td style="text-align: left;"><strong>EXPANDS</strong></td>
 <td style="text-align: left;">Andor et al., <em>Bioinformatics</em> 2014 <a href="https://doi.org/10.1093/bioinformatics/btt622">DOI</a></td>
+<td style="text-align: left;">2014</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Builds a cell-frequency probability distribution for each mutation from allele frequency and local CN, then clusters these into subpopulations; needs SNV frequencies plus CN segments.</td>
 </tr>
@@ -338,6 +363,7 @@ window.Quarto = {
 <td style="text-align: left;">10</td>
 <td style="text-align: left;"><strong>CHAT</strong></td>
 <td style="text-align: left;">Li &amp; Li, <em>Genome Biol</em> 2014 <a href="https://doi.org/10.1186/s13059-014-0473-4">DOI</a></td>
+<td style="text-align: left;">2014</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Estimates segment-level aneuploid fractions from depth and BAF, then adjusts SNV allele frequencies to CCFs; needs tumor/normal depth and BAF.</td>
 </tr>
@@ -345,6 +371,7 @@ window.Quarto = {
 <td style="text-align: left;">11</td>
 <td style="text-align: left;"><strong>cloneHD</strong></td>
 <td style="text-align: left;">Fischer et al., <em>Cell Rep</em> 2014 <a href="https://doi.org/10.1016/j.celrep.2014.04.055">DOI</a></td>
+<td style="text-align: left;">2014</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Hidden Markov model jointly inferring subclonal CN, BAF and SNV genotypes across samples; needs read-depth, BAF and SNV tracks, best suited to WGS.</td>
 </tr>
@@ -352,6 +379,7 @@ window.Quarto = {
 <td style="text-align: left;">12</td>
 <td style="text-align: left;"><strong>SubcloneSeeker</strong></td>
 <td style="text-align: left;">Qiao et al., <em>Genome Biol</em> 2014 <a href="https://doi.org/10.1186/s13059-014-0443-x">DOI</a></td>
+<td style="text-align: left;">2014</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Exhaustively enumerates subclone structures consistent with the prevalences of SNV and CNV clusters; needs pre-clustered prevalence estimates.</td>
 </tr>
@@ -359,6 +387,7 @@ window.Quarto = {
 <td style="text-align: left;">13</td>
 <td style="text-align: left;"><strong>TITAN</strong></td>
 <td style="text-align: left;">Ha et al., <em>Genome Res</em> 2014 <a href="https://doi.org/10.1101/gr.180281.114">DOI</a></td>
+<td style="text-align: left;">2014</td>
 <td style="text-align: left;">CN-centric</td>
 <td style="text-align: left;">HMM segmenting subclonal CN and LOH and estimating the cellular prevalence of each event; needs tumor/normal WGS or WES depth and germline allelic ratios.</td>
 </tr>
@@ -366,6 +395,7 @@ window.Quarto = {
 <td style="text-align: left;">14</td>
 <td style="text-align: left;"><strong>PhyloWGS</strong></td>
 <td style="text-align: left;">Deshwar et al., <em>Genome Biol</em> 2015 <a href="https://doi.org/10.1186/s13059-015-0602-8">DOI</a></td>
+<td style="text-align: left;">2015</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Tree-structured stick-breaking MCMC that places SNVs and CNA segments jointly on a phylogeny with a CN correction to VAFs; needs SNV counts plus subclonal CN calls.</td>
 </tr>
@@ -373,6 +403,7 @@ window.Quarto = {
 <td style="text-align: left;">15</td>
 <td style="text-align: left;"><strong>LICHeE</strong></td>
 <td style="text-align: left;">Popic et al., <em>Genome Biol</em> 2015 <a href="https://doi.org/10.1186/s13059-015-0647-8">DOI</a></td>
+<td style="text-align: left;">2015</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Builds lineage trees from multi-sample VAF clusters under ancestry constraints; requires CN-neutral SNVs.</td>
 </tr>
@@ -380,6 +411,7 @@ window.Quarto = {
 <td style="text-align: left;">16</td>
 <td style="text-align: left;"><strong>CITUP</strong></td>
 <td style="text-align: left;">Malikic et al., <em>Bioinformatics</em> 2015 <a href="https://doi.org/10.1093/bioinformatics/btv003">DOI</a></td>
+<td style="text-align: left;">2015</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Combinatorial or quadratic-integer-programming search over tree topologies fitting multi-sample frequencies; diploid assumption.</td>
 </tr>
@@ -387,6 +419,7 @@ window.Quarto = {
 <td style="text-align: left;">17</td>
 <td style="text-align: left;"><strong>AncesTree</strong></td>
 <td style="text-align: left;">El-Kebir et al., <em>Bioinformatics</em> 2015 <a href="https://doi.org/10.1093/bioinformatics/btv261">DOI</a></td>
+<td style="text-align: left;">2015</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Integer linear program (ILP) for the VAF factorization problem under a perfect phylogeny; needs multi-sample VAFs at diploid loci.</td>
 </tr>
@@ -394,6 +427,7 @@ window.Quarto = {
 <td style="text-align: left;">18</td>
 <td style="text-align: left;"><strong>SCHISM</strong></td>
 <td style="text-align: left;">Niknafs et al., <em>PLoS Comput Biol</em> 2015 <a href="https://doi.org/10.1371/journal.pcbi.1004416">DOI</a></td>
+<td style="text-align: left;">2015</td>
 <td style="text-align: left;">Yes (via CCF input)</td>
 <td style="text-align: left;">Hypothesis tests of lineage precedence between clusters, followed by a genetic-algorithm tree search; needs CN- and purity-adjusted CCFs.</td>
 </tr>
@@ -401,6 +435,7 @@ window.Quarto = {
 <td style="text-align: left;">19</td>
 <td style="text-align: left;"><strong>BayClone</strong></td>
 <td style="text-align: left;">Sengupta et al., <em>Pac Symp Biocomput</em> 2015 (no DOI; <a href="https://pubmed.ncbi.nlm.nih.gov/25592605/">PubMed</a>)</td>
+<td style="text-align: left;">2015</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Bayesian feature-allocation model assigning SNVs to latent subclones; uses read counts at loci assumed diploid.</td>
 </tr>
@@ -408,6 +443,7 @@ window.Quarto = {
 <td style="text-align: left;">20</td>
 <td style="text-align: left;"><strong>Canopy</strong></td>
 <td style="text-align: left;">Jiang et al., <em>PNAS</em> 2016 <a href="https://doi.org/10.1073/pnas.1522203113">DOI</a></td>
+<td style="text-align: left;">2016</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Bayesian MCMC phylogeny jointly using SNA allele counts and allele-specific CNA segment ratios; needs single- or multi-sample SNV counts and allele-specific CN.</td>
 </tr>
@@ -415,6 +451,7 @@ window.Quarto = {
 <td style="text-align: left;">21</td>
 <td style="text-align: left;"><strong>SPRUCE</strong></td>
 <td style="text-align: left;">El-Kebir et al., <em>Cell Syst</em> 2016 <a href="https://doi.org/10.1016/j.cels.2016.07.004">DOI</a></td>
+<td style="text-align: left;">2016</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Enumerates multi-state perfect phylogenies in which SNVs and CNAs co-evolve; needs multi-sample VAFs and allele-specific CN.</td>
 </tr>
@@ -422,6 +459,7 @@ window.Quarto = {
 <td style="text-align: left;">22</td>
 <td style="text-align: left;"><strong>BubbleTree</strong></td>
 <td style="text-align: left;">Zhu et al., <em>Nucleic Acids Res</em> 2016 <a href="https://doi.org/10.1093/nar/gkv1102">DOI</a></td>
+<td style="text-align: left;">2016</td>
 <td style="text-align: left;">CN-centric</td>
 <td style="text-align: left;">Jointly estimates purity, ploidy, allele-specific CN and clonality from a graph of depth ratio against BAF; needs tumor/normal depth, BAF and SNV calls.</td>
 </tr>
@@ -429,6 +467,7 @@ window.Quarto = {
 <td style="text-align: left;">23</td>
 <td style="text-align: left;"><strong>Cloe</strong></td>
 <td style="text-align: left;">Marass et al., <em>Ann Appl Stat</em> 2016 <a href="https://doi.org/10.1214/16-AOAS986">DOI</a></td>
+<td style="text-align: left;">2016</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Phylogenetic latent-feature model fit by MCMC to multi-sample VAFs; assumes CN-neutral loci.</td>
 </tr>
@@ -436,6 +475,7 @@ window.Quarto = {
 <td style="text-align: left;">24</td>
 <td style="text-align: left;"><strong>Treeomics</strong></td>
 <td style="text-align: left;">Reiter et al., <em>Nat Commun</em> 2017 <a href="https://doi.org/10.1038/ncomms14114">DOI</a></td>
+<td style="text-align: left;">2017</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Bayesian inference of whether each mutation is present per sample, followed by an ILP phylogeny for multi-region data; tolerant of CN effects but does not model them.</td>
 </tr>
@@ -443,6 +483,7 @@ window.Quarto = {
 <td style="text-align: left;">25</td>
 <td style="text-align: left;"><strong>ClonEvol</strong></td>
 <td style="text-align: left;">Dang et al., <em>Ann Oncol</em> 2017 <a href="https://doi.org/10.1093/annonc/mdx517">DOI</a></td>
+<td style="text-align: left;">2017</td>
 <td style="text-align: left;">Inherited</td>
 <td style="text-align: left;">Bootstrap-based clonal ordering and visualization of pre-computed clusters; CN handling depends on the upstream clustering tool.</td>
 </tr>
@@ -450,6 +491,7 @@ window.Quarto = {
 <td style="text-align: left;">26</td>
 <td style="text-align: left;"><strong>CTPsingle</strong></td>
 <td style="text-align: left;">Donmez et al., <em>J Comput Biol</em> 2017 <a href="https://doi.org/10.1089/cmb.2016.0148">DOI</a></td>
+<td style="text-align: left;">2017</td>
 <td style="text-align: left;">Not stated</td>
 <td style="text-align: left;">Infers purity and clonality from a single low-coverage sample (around 30x); needs SNV counts.</td>
 </tr>
@@ -457,6 +499,7 @@ window.Quarto = {
 <td style="text-align: left;">27</td>
 <td style="text-align: left;"><strong>QuantumClone</strong></td>
 <td style="text-align: left;">Deveau et al., <em>Bioinformatics</em> 2018 <a href="https://doi.org/10.1093/bioinformatics/bty016">DOI</a></td>
+<td style="text-align: left;">2018</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">EM clustering correcting for genotype and CN, with BIC model selection, for joint multi-sample analysis; needs SNV counts, CN genotypes and purity.</td>
 </tr>
@@ -464,6 +507,7 @@ window.Quarto = {
 <td style="text-align: left;">28</td>
 <td style="text-align: left;"><strong>Sclust</strong></td>
 <td style="text-align: left;">Cun et al., <em>Nat Protoc</em> 2018 <a href="https://doi.org/10.1038/nprot.2018.033">DOI</a></td>
+<td style="text-align: left;">2018</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Infers purity, ploidy and subclonal CN, then clusters CN-corrected CCFs; needs tumor/normal BAMs (WGS preferred).</td>
 </tr>
@@ -471,6 +515,7 @@ window.Quarto = {
 <td style="text-align: left;">29</td>
 <td style="text-align: left;"><strong>CloneFinder</strong></td>
 <td style="text-align: left;">Miura et al., <em>Bioinformatics</em> 2018 <a href="https://doi.org/10.1093/bioinformatics/bty469">DOI</a></td>
+<td style="text-align: left;">2018</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Phylogeny-aware iterative decomposition of multi-region SNV frequencies into clone genotypes; best used on CN-neutral SNVs.</td>
 </tr>
@@ -478,6 +523,7 @@ window.Quarto = {
 <td style="text-align: left;">30</td>
 <td style="text-align: left;"><strong>TUSV</strong></td>
 <td style="text-align: left;">Eaton et al., <em>Bioinformatics</em> 2018 <a href="https://doi.org/10.1093/bioinformatics/bty270">DOI</a></td>
+<td style="text-align: left;">2018</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">ILP deconvolution into a phylogeny that includes SNVs, CNAs and structural variants (SVs); needs multi-sample WGS SNV, CN and SV calls.</td>
 </tr>
@@ -485,6 +531,7 @@ window.Quarto = {
 <td style="text-align: left;">31</td>
 <td style="text-align: left;"><strong>CloneDeMix</strong></td>
 <td style="text-align: left;">Tai et al., <em>PLoS One</em> 2018 <a href="https://doi.org/10.1371/journal.pone.0206579">DOI</a></td>
+<td style="text-align: left;">2018</td>
 <td style="text-align: left;">CN-centric</td>
 <td style="text-align: left;">Two-way mixture Poisson model on read depth inferring subclonal CN, mutational cellular prevalence and mutation order; needs tumor/normal depth.</td>
 </tr>
@@ -492,6 +539,7 @@ window.Quarto = {
 <td style="text-align: left;">32</td>
 <td style="text-align: left;"><strong>BAMSE</strong></td>
 <td style="text-align: left;">Toosi et al., <em>BMC Bioinformatics</em> 2019 <a href="https://doi.org/10.1186/s12859-019-2824-3">DOI</a></td>
+<td style="text-align: left;">2019</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Bayesian model selection over the number of subclones and tree topology from read counts; mainly assumes diploid loci.</td>
 </tr>
@@ -499,6 +547,7 @@ window.Quarto = {
 <td style="text-align: left;">33</td>
 <td style="text-align: left;"><strong>CALDER</strong></td>
 <td style="text-align: left;">Myers et al., <em>Cell Syst</em> 2019 <a href="https://doi.org/10.1016/j.cels.2019.05.010">DOI</a></td>
+<td style="text-align: left;">2019</td>
 <td style="text-align: left;">Yes (via input)</td>
 <td style="text-align: left;">Mixed-ILP phylogeny that respects the time order of longitudinal samples; needs CN-adjusted counts from serial samples.</td>
 </tr>
@@ -506,6 +555,7 @@ window.Quarto = {
 <td style="text-align: left;">34</td>
 <td style="text-align: left;"><strong>GenoClone</strong></td>
 <td style="text-align: left;">Zou, Jin &amp; Au, <em>Brief Bioinform</em> 2019 <a href="https://doi.org/10.1093/bib/bby084">DOI</a></td>
+<td style="text-align: left;">2019</td>
 <td style="text-align: left;">Not stated</td>
 <td style="text-align: left;">Combines VAF with linkage between somatic and germline variants from paired-end or long reads to infer subclones; needs reads spanning both.</td>
 </tr>
@@ -513,6 +563,7 @@ window.Quarto = {
 <td style="text-align: left;">35</td>
 <td style="text-align: left;"><strong>B-SCITE</strong></td>
 <td style="text-align: left;">Malikic et al., <em>Nat Commun</em> 2019 <a href="https://doi.org/10.1038/s41467-019-10737-5">DOI</a></td>
+<td style="text-align: left;">2019</td>
 <td style="text-align: left;">Partial</td>
 <td style="text-align: left;">Infers tumor phylogenies from combined single-cell and bulk sequencing data and is reported to stay robust when bulk VAFs are distorted by CN; needs both bulk and single-cell data.</td>
 </tr>
@@ -520,6 +571,7 @@ window.Quarto = {
 <td style="text-align: left;">36</td>
 <td style="text-align: left;"><strong>BaSiC</strong></td>
 <td style="text-align: left;">Sun et al., <em>Biometrics</em> 2020 <a href="https://doi.org/10.1111/biom.13198">DOI</a></td>
+<td style="text-align: left;">2020</td>
 <td style="text-align: left;">Not stated</td>
 <td style="text-align: left;">Jointly models bulk and single-cell DNA-seq to infer intratumor heterogeneity; needs both data types.</td>
 </tr>
@@ -527,6 +579,7 @@ window.Quarto = {
 <td style="text-align: left;">37</td>
 <td style="text-align: left;"><strong>PyClone-VI</strong></td>
 <td style="text-align: left;">Gillis &amp; Roth, <em>BMC Bioinformatics</em> 2020 <a href="https://doi.org/10.1186/s12859-020-03919-2">DOI</a></td>
+<td style="text-align: left;">2020</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Variational-inference version of PyClone’s CN-aware mixture that scales to WGS-sized mutation sets; needs ref/alt counts, major/minor CN and purity.</td>
 </tr>
@@ -534,6 +587,7 @@ window.Quarto = {
 <td style="text-align: left;">38</td>
 <td style="text-align: left;"><strong>MOBSTER</strong></td>
 <td style="text-align: left;">Caravagna et al., <em>Nat Genet</em> 2020 <a href="https://doi.org/10.1038/s41588-020-0675-5">DOI</a>; R package: <em>BMC Bioinformatics</em> 2020 <a href="https://doi.org/10.1186/s12859-020-03863-1">DOI</a></td>
+<td style="text-align: left;">2020</td>
 <td style="text-align: left;">Yes (per karyotype)</td>
 <td style="text-align: left;">Beta-mixture plus Pareto-tail model that accounts for neutral within-clone mutations, fitted separately for each karyotype; needs high-depth WGS counts plus allele-specific CN and purity.</td>
 </tr>
@@ -541,6 +595,7 @@ window.Quarto = {
 <td style="text-align: left;">39</td>
 <td style="text-align: left;"><strong>FastClone</strong></td>
 <td style="text-align: left;">Xiao et al., <em>Nat Commun</em> 2020 <a href="https://doi.org/10.1038/s41467-020-18169-2">DOI</a></td>
+<td style="text-align: left;">2020</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Fast probabilistic deconvolution assigning SNVs to subclones while modeling which CN allele they lie on; single-sample only, and needs SNV counts plus CN and purity.</td>
 </tr>
@@ -548,6 +603,7 @@ window.Quarto = {
 <td style="text-align: left;">40</td>
 <td style="text-align: left;"><strong>HATCHet</strong></td>
 <td style="text-align: left;">Zaccaria &amp; Raphael, <em>Nat Commun</em> 2020 <a href="https://doi.org/10.1038/s41467-020-17967-y">DOI</a></td>
+<td style="text-align: left;">2020</td>
 <td style="text-align: left;">CN-centric</td>
 <td style="text-align: left;">Jointly infers allele- and clone-specific CN across samples by clustering depth ratio and BAF; needs multi-sample WGS (or WES) BAMs.</td>
 </tr>
@@ -555,6 +611,7 @@ window.Quarto = {
 <td style="text-align: left;">41</td>
 <td style="text-align: left;"><strong>SVclone</strong></td>
 <td style="text-align: left;">Cmero et al., <em>Nat Commun</em> 2020 <a href="https://doi.org/10.1038/s41467-020-14351-8">DOI</a></td>
+<td style="text-align: left;">2020</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Estimates the CCF and copy number of SV breakpoints from both breakends; needs WGS BAMs, SV calls and CN.</td>
 </tr>
@@ -562,6 +619,7 @@ window.Quarto = {
 <td style="text-align: left;">42</td>
 <td style="text-align: left;"><strong>TrackSig</strong></td>
 <td style="text-align: left;">Rubanova et al., <em>Nat Commun</em> 2020 <a href="https://doi.org/10.1038/s41467-020-14352-7">DOI</a></td>
+<td style="text-align: left;">2020</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Orders mutations by CN-corrected CCF and detects changes in mutational-signature activity along that order; needs WGS SNVs with CN and purity.</td>
 </tr>
@@ -569,6 +627,7 @@ window.Quarto = {
 <td style="text-align: left;">43</td>
 <td style="text-align: left;"><strong>msphy-SCNAClonal</strong></td>
 <td style="text-align: left;">Chu, Nie &amp; Wang, <em>Front Genet</em> 2020 <a href="https://doi.org/10.3389/fgene.2019.01374">DOI</a></td>
+<td style="text-align: left;">2020</td>
 <td style="text-align: left;">CN-centric</td>
 <td style="text-align: left;">Subclonal reconstruction of somatic CN alterations with read-count-ratio bias correction and false-breakpoint filtering; needs tumor/normal NGS data.</td>
 </tr>
@@ -576,6 +635,7 @@ window.Quarto = {
 <td style="text-align: left;">44</td>
 <td style="text-align: left;"><strong>DeCiFer</strong></td>
 <td style="text-align: left;">Satas et al., <em>Cell Syst</em> 2021 <a href="https://doi.org/10.1016/j.cels.2021.07.006">DOI</a></td>
+<td style="text-align: left;">2021</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Clusters SNVs by descendant cell fraction, explicitly modeling SNVs gained or lost through CNAs, jointly across samples; needs multi-sample counts and allele-specific CN.</td>
 </tr>
@@ -583,6 +643,7 @@ window.Quarto = {
 <td style="text-align: left;">45</td>
 <td style="text-align: left;"><strong>CloneSig</strong></td>
 <td style="text-align: left;">Abécassis et al., <em>Nat Commun</em> 2021 <a href="https://doi.org/10.1038/s41467-021-24992-y">DOI</a></td>
+<td style="text-align: left;">2021</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Joint model of subclonal clustering and mutational signatures, with signature exposures specific to each clone; needs SNVs with sequence context plus CN and purity.</td>
 </tr>
@@ -590,6 +651,7 @@ window.Quarto = {
 <td style="text-align: left;">46</td>
 <td style="text-align: left;"><strong>SubMARine</strong></td>
 <td style="text-align: left;">Sundermann et al., <em>PLoS Comput Biol</em> 2021 <a href="https://doi.org/10.1371/journal.pcbi.1008400">DOI</a></td>
+<td style="text-align: left;">2021</td>
 <td style="text-align: left;">Yes (extension)</td>
 <td style="text-align: left;">Polynomial-time partial clone tree summarizing all valid trees, with an extension for subclonal CNAs; needs pre-clustered subclone frequencies.</td>
 </tr>
@@ -597,6 +659,7 @@ window.Quarto = {
 <td style="text-align: left;">47</td>
 <td style="text-align: left;"><strong>CRUST</strong></td>
 <td style="text-align: left;">Chattopadhyay et al., <em>Brief Bioinform</em> 2021 <a href="https://doi.org/10.1093/bib/bbab292">DOI</a></td>
+<td style="text-align: left;">2021</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Semi-supervised multi-sample deconvolution with purity normalization and CN adjustment, able to estimate CN itself if none is supplied; works at about 50x.</td>
 </tr>
@@ -604,6 +667,7 @@ window.Quarto = {
 <td style="text-align: left;">48</td>
 <td style="text-align: left;"><strong>DEVOLUTION</strong></td>
 <td style="text-align: left;">Andersson et al., <em>Commun Biol</em> 2021 <a href="https://doi.org/10.1038/s42003-021-02637-6">DOI</a></td>
+<td style="text-align: left;">2021</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Subclonal deconvolution followed by phylogeny reconstruction that integrates copy number and sequencing information across tumor regions, provided each mutation’s mutated clone fraction is known; accepts SNP-array, WES, WGS or targeted data.</td>
 </tr>
@@ -611,6 +675,7 @@ window.Quarto = {
 <td style="text-align: left;">49</td>
 <td style="text-align: left;"><strong>Unnamed AML method</strong></td>
 <td style="text-align: left;">Stiehl &amp; Marciniak-Czochra, <em>Front Physiol</em> 2021 <a href="https://doi.org/10.3389/fphys.2021.596194">DOI</a></td>
+<td style="text-align: left;">2021</td>
 <td style="text-align: left;">No</td>
 <td style="text-align: left;">Enumerates all clonal hierarchies compatible with the bulk VAFs of one sample; needs VAFs only.</td>
 </tr>
@@ -618,6 +683,7 @@ window.Quarto = {
 <td style="text-align: left;">50</td>
 <td style="text-align: left;"><strong>HDP bulk+single-cell model</strong></td>
 <td style="text-align: left;">He et al., <em>Ann Appl Stat</em> 2021 <a href="https://doi.org/10.1214/20-aoas1434">DOI</a></td>
+<td style="text-align: left;">2021</td>
 <td style="text-align: left;">Not stated</td>
 <td style="text-align: left;">Hierarchical Dirichlet process mixture with Gibbs sampling for structured bulk and single-cell sampling designs; needs both data types.</td>
 </tr>
@@ -625,6 +691,7 @@ window.Quarto = {
 <td style="text-align: left;">51</td>
 <td style="text-align: left;"><strong>Pairtree</strong></td>
 <td style="text-align: left;">Wintersinger et al., <em>Blood Cancer Discov</em> 2022 <a href="https://doi.org/10.1158/2643-3230.BCD-21-0092">DOI</a></td>
+<td style="text-align: left;">2022</td>
 <td style="text-align: left;">Yes (via ω)</td>
 <td style="text-align: left;">Computes pairwise relations between mutation clusters, then samples trees by MCMC, for many samples; needs counts plus a CN-derived variant read probability (ω) per mutation.</td>
 </tr>
@@ -632,6 +699,7 @@ window.Quarto = {
 <td style="text-align: left;">52</td>
 <td style="text-align: left;"><strong>PICTograph</strong></td>
 <td style="text-align: left;">Zheng et al., <em>Bioinformatics</em> 2022 <a href="https://doi.org/10.1093/bioinformatics/btac367">DOI</a></td>
+<td style="text-align: left;">2022</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Bayesian (JAGS) model integrating over tree space using CN-adjusted CCFs; needs SNV counts, CN and purity.</td>
 </tr>
@@ -639,6 +707,7 @@ window.Quarto = {
 <td style="text-align: left;">53</td>
 <td style="text-align: left;"><strong>MEDICC2</strong></td>
 <td style="text-align: left;">Kaufmann et al., <em>Genome Biol</em> 2022 <a href="https://doi.org/10.1186/s13059-022-02794-9">DOI</a></td>
+<td style="text-align: left;">2022</td>
 <td style="text-align: left;">CN-centric</td>
 <td style="text-align: left;">Minimum-event distance phylogenies from allele-specific CN profiles, including whole-genome doubling; needs allele-specific CN segments.</td>
 </tr>
@@ -646,6 +715,7 @@ window.Quarto = {
 <td style="text-align: left;">54</td>
 <td style="text-align: left;"><strong>MAGOS</strong></td>
 <td style="text-align: left;">Ahmadinejad et al., <em>Mol Biol Evol</em> 2022 <a href="https://doi.org/10.1093/molbev/msac136">DOI</a></td>
+<td style="text-align: left;">2022</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Clustering error model accounting for how VAF variance depends on depth and mean VAF, working down to about 30x; accepts SNVs and CNVs from one or more samples.</td>
 </tr>
@@ -653,6 +723,7 @@ window.Quarto = {
 <td style="text-align: left;">55</td>
 <td style="text-align: left;"><strong>cfdna-wgs</strong></td>
 <td style="text-align: left;">Herberts et al., <em>Nature</em> 2022 <a href="https://doi.org/10.1038/s41586-022-04975-9">DOI</a></td>
+<td style="text-align: left;">2022</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">K-means-based clustering of CN-corrected mutation fractions from deep ctDNA WGS; needs SNV counts, CN and ctDNA fraction.</td>
 </tr>
@@ -660,6 +731,7 @@ window.Quarto = {
 <td style="text-align: left;">56</td>
 <td style="text-align: left;"><strong>CONIPHER</strong></td>
 <td style="text-align: left;">Grigoriadis et al., <em>Nat Protoc</em> 2024 <a href="https://doi.org/10.1038/s41596-023-00913-9">DOI</a></td>
+<td style="text-align: left;">2024</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">TRACERx framework combining CN-aware clustering, error correction (including mutation loss) and multi-sample tree building; needs multi-region counts, allele-specific CN and purity.</td>
 </tr>
@@ -667,6 +739,7 @@ window.Quarto = {
 <td style="text-align: left;">57</td>
 <td style="text-align: left;"><strong>Orchard</strong></td>
 <td style="text-align: left;">Kulman et al., <em>PLoS Comput Biol</em> 2024 <a href="https://doi.org/10.1371/journal.pcbi.1012653">DOI</a></td>
+<td style="text-align: left;">2024</td>
 <td style="text-align: left;">Yes (via ω)</td>
 <td style="text-align: left;">Stochastic combinatorial search for large phylogenies, the successor to Pairtree; same inputs as Pairtree.</td>
 </tr>
@@ -674,6 +747,7 @@ window.Quarto = {
 <td style="text-align: left;">58</td>
 <td style="text-align: left;"><strong>RETCHER</strong></td>
 <td style="text-align: left;">Wang et al., <em>Brief Bioinform</em> 2024 <a href="https://doi.org/10.1093/bib/bbae516">DOI</a></td>
+<td style="text-align: left;">2024</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Identifies the number of mutated copies of each SNV under CN changes to correct CCFs, assesses how credible each cluster is, and infers phylogenies; needs multi-sample SNV and CN data.</td>
 </tr>
@@ -681,6 +755,7 @@ window.Quarto = {
 <td style="text-align: left;">59</td>
 <td style="text-align: left;"><strong>PhyClone</strong></td>
 <td style="text-align: left;">Hurtado, Bouchard-Côté &amp; Roth, <em>Bioinformatics</em> 2025 <a href="https://doi.org/10.1093/bioinformatics/btaf344">DOI</a></td>
+<td style="text-align: left;">2025</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Bayesian sampler over phylogenies (forest-structured Chinese restaurant process with particle Gibbs) that models mutation loss and outliers; needs allele-specific CN and counts from one or more samples.</td>
 </tr>
@@ -688,6 +763,7 @@ window.Quarto = {
 <td style="text-align: left;">60</td>
 <td style="text-align: left;"><strong>MyClone</strong></td>
 <td style="text-align: left;">Guo et al., <em>BMC Bioinformatics</em> 2025 <a href="https://doi.org/10.1186/s12859-025-06252-8">DOI</a></td>
+<td style="text-align: left;">2025</td>
 <td style="text-align: left;">Yes (heuristic)</td>
 <td style="text-align: left;">Variational-EM clustering of copy-neutral mutations, then reassignment of CNA-affected mutations to those clones by matching possible genotypes; designed for deep (around 2,000x) targeted or ctDNA data and weaker at WES/WGS depth.</td>
 </tr>
@@ -695,6 +771,7 @@ window.Quarto = {
 <td style="text-align: left;">61</td>
 <td style="text-align: left;"><strong>Sapling</strong></td>
 <td style="text-align: left;">Qi, Schmidt &amp; El-Kebir, <em>Algorithms Mol Biol</em> 2026 <a href="https://doi.org/10.1186/s13015-025-00295-5">DOI</a></td>
+<td style="text-align: left;">2026</td>
 <td style="text-align: left;">Not stated</td>
 <td style="text-align: left;">Infers a small set of backbone trees that summarize the space of plausible phylogenies from bulk read counts, and can also infer full trees.</td>
 </tr>
@@ -702,6 +779,7 @@ window.Quarto = {
 <td style="text-align: left;">62</td>
 <td style="text-align: left;"><strong>CliPP</strong> <em>(preprint, not peer-reviewed)</em></td>
 <td style="text-align: left;">Jiang et al., <em>bioRxiv</em> 2021, updated 2026 <a href="https://doi.org/10.1101/2021.03.31.437383">DOI</a></td>
+<td style="text-align: left;">2021</td>
 <td style="text-align: left;">Yes</td>
 <td style="text-align: left;">Penalized-likelihood (pairwise fusion) clustering of cellular prevalences that needs no extensive priors; takes WGS/WES variant calls with read depth, allele counts and copy-number segments.</td>
 </tr>
@@ -709,6 +787,7 @@ window.Quarto = {
 <td style="text-align: left;">63</td>
 <td style="text-align: left;"><em>Benchmark:</em> <strong>Tanner et al.</strong></td>
 <td style="text-align: left;"><em>Nat Commun</em> 2021 <a href="https://doi.org/10.1038/s41467-021-26698-7">DOI</a></td>
+<td style="text-align: left;">2021</td>
 <td style="text-align: left;">n/a</td>
 <td style="text-align: left;">Benchmarked complete pipelines on 80 simulated bulk WES datasets; Mutect2, then FACETS, then PyClone-VI was the best combination, and purity and purity-corrected depth drove accuracy.</td>
 </tr>
@@ -716,6 +795,7 @@ window.Quarto = {
 <td style="text-align: left;">64</td>
 <td style="text-align: left;"><em>Benchmark:</em> <strong>ICGC-TCGA DREAM Challenge (Salcedo et al.)</strong></td>
 <td style="text-align: left;"><em>Nat Biotechnol</em> 2024 <a href="https://doi.org/10.1038/s41587-024-02250-y">DOI</a></td>
+<td style="text-align: left;">2024</td>
 <td style="text-align: left;">n/a</td>
 <td style="text-align: left;">Benchmarked 31 single-sample subclonal reconstruction algorithms on 51 simulated tumors across seven tasks; no single method won all tasks, and CN state, purity-adjusted depth and mappability affected performance.</td>
 </tr>
