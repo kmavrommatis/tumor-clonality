@@ -122,11 +122,6 @@ window.Quarto = {
     <a class="nav-link" href="./index.qmd"> 
 <span class="menu-text">Home</span></a>
   </li>  
-  <li class="nav-item">
-    <span class="nav-link">
-<span class="menu-text">about.qmd</span>
-    </span>
-  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -143,39 +138,39 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#subclonal-deconvolution-in-bulk-ngs-data-tools-statistics-and-feasibility" id="toc-subclonal-deconvolution-in-bulk-ngs-data-tools-statistics-and-feasibility" class="nav-link active" data-scroll-target="#subclonal-deconvolution-in-bulk-ngs-data-tools-statistics-and-feasibility"><span class="header-section-number">1</span> Subclonal deconvolution in bulk NGS data: tools, statistics, and feasibility</a>
+  <li><a href="#subclonal-deconvolution-in-bulk-ngs-data-tools-statistics-and-feasibility" id="toc-subclonal-deconvolution-in-bulk-ngs-data-tools-statistics-and-feasibility" class="nav-link active" data-scroll-target="#subclonal-deconvolution-in-bulk-ngs-data-tools-statistics-and-feasibility">Subclonal deconvolution in bulk NGS data: tools, statistics, and feasibility</a>
   <ul class="collapse">
-  <li><a href="#subclonal-deconvolution-tools-and-how-they-handle-cnas" id="toc-subclonal-deconvolution-tools-and-how-they-handle-cnas" class="nav-link" data-scroll-target="#subclonal-deconvolution-tools-and-how-they-handle-cnas"><span class="header-section-number">1.1</span> 1. Subclonal deconvolution tools and how they handle CNAs</a></li>
-  <li><a href="#feasibility-of-subclone-detection" id="toc-feasibility-of-subclone-detection" class="nav-link" data-scroll-target="#feasibility-of-subclone-detection"><span class="header-section-number">1.2</span> 2. Feasibility of subclone detection</a>
+  <li><a href="#subclonal-deconvolution-tools-and-how-they-handle-cnas" id="toc-subclonal-deconvolution-tools-and-how-they-handle-cnas" class="nav-link" data-scroll-target="#subclonal-deconvolution-tools-and-how-they-handle-cnas">Subclonal deconvolution tools and how they handle CNAs</a></li>
+  <li><a href="#feasibility-of-subclone-detection" id="toc-feasibility-of-subclone-detection" class="nav-link" data-scroll-target="#feasibility-of-subclone-detection">Feasibility of subclone detection</a>
   <ul class="collapse">
-  <li><a href="#x-typical-wes" id="toc-x-typical-wes" class="nav-link" data-scroll-target="#x-typical-wes"><span class="header-section-number">1.2.1</span> 100x (typical WES)</a></li>
-  <li><a href="#x-deep-wes" id="toc-x-deep-wes" class="nav-link" data-scroll-target="#x-deep-wes"><span class="header-section-number">1.2.2</span> 200x (deep WES)</a></li>
+  <li><a href="#x-typical-wes" id="toc-x-typical-wes" class="nav-link" data-scroll-target="#x-typical-wes">100x (typical WES)</a></li>
+  <li><a href="#x-deep-wes" id="toc-x-deep-wes" class="nav-link" data-scroll-target="#x-deep-wes">200x (deep WES)</a></li>
   </ul></li>
-  <li><a href="#statistical-model-of-subclone-detection" id="toc-statistical-model-of-subclone-detection" class="nav-link" data-scroll-target="#statistical-model-of-subclone-detection"><span class="header-section-number">1.3</span> 3. Statistical model of subclone detection</a>
+  <li><a href="#statistical-model-of-subclone-detection" id="toc-statistical-model-of-subclone-detection" class="nav-link" data-scroll-target="#statistical-model-of-subclone-detection">Statistical model of subclone detection</a>
   <ul class="collapse">
-  <li><a href="#a.-binomial-variance-and-peak-separation-deltavaf" id="toc-a.-binomial-variance-and-peak-separation-deltavaf" class="nav-link" data-scroll-target="#a.-binomial-variance-and-peak-separation-deltavaf"><span class="header-section-number">1.3.1</span> A. Binomial variance and peak separation (<span class="math inline">\(\Delta\)</span>VAF)</a></li>
-  <li><a href="#b.-beta-binomial-sequencing-noise" id="toc-b.-beta-binomial-sequencing-noise" class="nav-link" data-scroll-target="#b.-beta-binomial-sequencing-noise"><span class="header-section-number">1.3.2</span> B. Beta-binomial sequencing noise</a></li>
-  <li><a href="#c.-variant-caller-attrition-and-detection-bias" id="toc-c.-variant-caller-attrition-and-detection-bias" class="nav-link" data-scroll-target="#c.-variant-caller-attrition-and-detection-bias"><span class="header-section-number">1.3.3</span> C. Variant caller attrition and detection bias</a></li>
-  <li><a href="#d.-model-complexity-and-cluster-number" id="toc-d.-model-complexity-and-cluster-number" class="nav-link" data-scroll-target="#d.-model-complexity-and-cluster-number"><span class="header-section-number">1.3.4</span> D. Model complexity and cluster number</a></li>
+  <li><a href="#binomial-variance-and-peak-separation-deltavaf" id="toc-binomial-variance-and-peak-separation-deltavaf" class="nav-link" data-scroll-target="#binomial-variance-and-peak-separation-deltavaf">Binomial variance and peak separation (<span class="math inline">\(\Delta\)</span>VAF)</a></li>
+  <li><a href="#beta-binomial-sequencing-noise" id="toc-beta-binomial-sequencing-noise" class="nav-link" data-scroll-target="#beta-binomial-sequencing-noise">Beta-binomial sequencing noise</a></li>
+  <li><a href="#variant-caller-attrition-and-detection-bias" id="toc-variant-caller-attrition-and-detection-bias" class="nav-link" data-scroll-target="#variant-caller-attrition-and-detection-bias">Variant caller attrition and detection bias</a></li>
+  <li><a href="#model-complexity-and-cluster-number" id="toc-model-complexity-and-cluster-number" class="nav-link" data-scroll-target="#model-complexity-and-cluster-number">Model complexity and cluster number</a></li>
   </ul></li>
-  <li><a href="#complications-in-real-data" id="toc-complications-in-real-data" class="nav-link" data-scroll-target="#complications-in-real-data"><span class="header-section-number">1.4</span> 4. Complications in real data</a>
+  <li><a href="#complications-in-real-data" id="toc-complications-in-real-data" class="nav-link" data-scroll-target="#complications-in-real-data">Complications in real data</a>
   <ul class="collapse">
-  <li><a href="#a.-copy-number-effects" id="toc-a.-copy-number-effects" class="nav-link" data-scroll-target="#a.-copy-number-effects"><span class="header-section-number">1.4.1</span> A. Copy-number effects</a></li>
-  <li><a href="#b.-upstream-errors-in-purity-ploidy-and-copy-number-calls" id="toc-b.-upstream-errors-in-purity-ploidy-and-copy-number-calls" class="nav-link" data-scroll-target="#b.-upstream-errors-in-purity-ploidy-and-copy-number-calls"><span class="header-section-number">1.4.2</span> B. Upstream errors in purity, ploidy and copy-number calls</a></li>
-  <li><a href="#c.-the-neutral-tail" id="toc-c.-the-neutral-tail" class="nav-link" data-scroll-target="#c.-the-neutral-tail"><span class="header-section-number">1.4.3</span> C. The neutral tail</a></li>
-  <li><a href="#d.-multi-region-and-longitudinal-sampling" id="toc-d.-multi-region-and-longitudinal-sampling" class="nav-link" data-scroll-target="#d.-multi-region-and-longitudinal-sampling"><span class="header-section-number">1.4.4</span> D. Multi-region and longitudinal sampling</a></li>
+  <li><a href="#copy-number-effects" id="toc-copy-number-effects" class="nav-link" data-scroll-target="#copy-number-effects">Copy-number effects</a></li>
+  <li><a href="#upstream-errors-in-purity-ploidy-and-copy-number-calls" id="toc-upstream-errors-in-purity-ploidy-and-copy-number-calls" class="nav-link" data-scroll-target="#upstream-errors-in-purity-ploidy-and-copy-number-calls">Upstream errors in purity, ploidy and copy-number calls</a></li>
+  <li><a href="#the-neutral-tail" id="toc-the-neutral-tail" class="nav-link" data-scroll-target="#the-neutral-tail">The neutral tail</a></li>
+  <li><a href="#multi-region-and-longitudinal-sampling" id="toc-multi-region-and-longitudinal-sampling" class="nav-link" data-scroll-target="#multi-region-and-longitudinal-sampling">Multi-region and longitudinal sampling</a></li>
   </ul></li>
-  <li><a href="#intuitive-guide-for-bioinformaticians" id="toc-intuitive-guide-for-bioinformaticians" class="nav-link" data-scroll-target="#intuitive-guide-for-bioinformaticians"><span class="header-section-number">1.5</span> 5. Intuitive guide for bioinformaticians</a>
+  <li><a href="#intuitive-guide-for-bioinformaticians" id="toc-intuitive-guide-for-bioinformaticians" class="nav-link" data-scroll-target="#intuitive-guide-for-bioinformaticians">Intuitive guide for bioinformaticians</a>
   <ul class="collapse">
-  <li><a href="#coverage-is-focus-the-blurry-eye-chart" id="toc-coverage-is-focus-the-blurry-eye-chart" class="nav-link" data-scroll-target="#coverage-is-focus-the-blurry-eye-chart"><span class="header-section-number">1.5.1</span> 1. Coverage is focus: the blurry eye chart</a></li>
-  <li><a href="#why-a-subclone-needs-enough-mutations" id="toc-why-a-subclone-needs-enough-mutations" class="nav-link" data-scroll-target="#why-a-subclone-needs-enough-mutations"><span class="header-section-number">1.5.2</span> 2. Why a subclone needs enough mutations</a></li>
-  <li><a href="#the-death-valley-of-variant-callers" id="toc-the-death-valley-of-variant-callers" class="nav-link" data-scroll-target="#the-death-valley-of-variant-callers"><span class="header-section-number">1.5.3</span> 3. The “Death Valley” of variant callers</a></li>
-  <li><a href="#copy-number-moves-the-humps" id="toc-copy-number-moves-the-humps" class="nav-link" data-scroll-target="#copy-number-moves-the-humps"><span class="header-section-number">1.5.4</span> 4. Copy number moves the humps</a></li>
-  <li><a href="#purity-and-copy-number-errors-carry-through" id="toc-purity-and-copy-number-errors-carry-through" class="nav-link" data-scroll-target="#purity-and-copy-number-errors-carry-through"><span class="header-section-number">1.5.5</span> 5. Purity and copy-number errors carry through</a></li>
-  <li><a href="#a-low-bump-is-not-always-a-subclone" id="toc-a-low-bump-is-not-always-a-subclone" class="nav-link" data-scroll-target="#a-low-bump-is-not-always-a-subclone"><span class="header-section-number">1.5.6</span> 6. A low bump is not always a subclone</a></li>
-  <li><a href="#more-samples-can-beat-more-depth" id="toc-more-samples-can-beat-more-depth" class="nav-link" data-scroll-target="#more-samples-can-beat-more-depth"><span class="header-section-number">1.5.7</span> 7. More samples can beat more depth</a></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">1.5.8</span> Summary</a></li>
+  <li><a href="#coverage-is-focus-the-blurry-eye-chart" id="toc-coverage-is-focus-the-blurry-eye-chart" class="nav-link" data-scroll-target="#coverage-is-focus-the-blurry-eye-chart">Coverage is focus: the blurry eye chart</a></li>
+  <li><a href="#why-a-subclone-needs-enough-mutations" id="toc-why-a-subclone-needs-enough-mutations" class="nav-link" data-scroll-target="#why-a-subclone-needs-enough-mutations">Why a subclone needs enough mutations</a></li>
+  <li><a href="#the-limits-of-variant-callers" id="toc-the-limits-of-variant-callers" class="nav-link" data-scroll-target="#the-limits-of-variant-callers">The limits of variant callers</a></li>
+  <li><a href="#copy-number-moves-the-humps" id="toc-copy-number-moves-the-humps" class="nav-link" data-scroll-target="#copy-number-moves-the-humps">Copy number moves the humps</a></li>
+  <li><a href="#purity-and-copy-number-errors-carry-through" id="toc-purity-and-copy-number-errors-carry-through" class="nav-link" data-scroll-target="#purity-and-copy-number-errors-carry-through">Purity and copy-number errors carry through</a></li>
+  <li><a href="#a-low-bump-is-not-always-a-subclone" id="toc-a-low-bump-is-not-always-a-subclone" class="nav-link" data-scroll-target="#a-low-bump-is-not-always-a-subclone">A low bump is not always a subclone</a></li>
+  <li><a href="#more-samples-can-beat-more-depth" id="toc-more-samples-can-beat-more-depth" class="nav-link" data-scroll-target="#more-samples-can-beat-more-depth">More samples can beat more depth</a></li>
   </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
   </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="subclonal_deconvolution_guide.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
@@ -213,13 +208,14 @@ window.Quarto = {
 </header>
 
 
-<section id="subclonal-deconvolution-in-bulk-ngs-data-tools-statistics-and-feasibility" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Subclonal deconvolution in bulk NGS data: tools, statistics, and feasibility</h1>
+<section id="subclonal-deconvolution-in-bulk-ngs-data-tools-statistics-and-feasibility" class="level1">
+<h1>Subclonal deconvolution in bulk NGS data: tools, statistics, and feasibility</h1>
 <p>This guide covers tools for subclonal deconvolution of tumors from bulk whole exome sequencing (WES) and whole genome sequencing (WGS), with attention to how each tool handles copy-number alterations (CNAs). It estimates how sequencing depth and tumor purity limit subclone detection, and describes four problems that affect real analyses: copy-number effects, errors in upstream purity and copy-number calls, the neutral tail of low-frequency mutations, and the trade-off between deeper sequencing and more samples.</p>
-<section id="subclonal-deconvolution-tools-and-how-they-handle-cnas" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="subclonal-deconvolution-tools-and-how-they-handle-cnas"><span class="header-section-number">1.1</span> 1. Subclonal deconvolution tools and how they handle CNAs</h2>
+<section id="subclonal-deconvolution-tools-and-how-they-handle-cnas" class="level2">
+<h2 class="anchored" data-anchor-id="subclonal-deconvolution-tools-and-how-they-handle-cnas">Subclonal deconvolution tools and how they handle CNAs</h2>
 <p>Restricting an analysis to diploid regions discards much of the genome, so the table records how each tool treats copy number. Tools are listed by year of publication, followed by CliPP (a widely used preprint) and two benchmark studies. In the CNA handling column, <em>Yes</em> means the tool models copy number when it estimates cancer cell fractions (CCFs) or builds trees; <em>CN-centric</em> means it infers subclones from copy-number profiles rather than from SNVs; <em>No</em> means it should be run only on copy-neutral regions; and <em>Not stated</em> means the original abstract does not say. Every DOI was checked against its PubMed record, except Cloe (<em>Ann Appl Stat</em>, not indexed in PubMed), whose DOI comes from the publisher. BayClone appeared in conference proceedings without a DOI, so it links to PubMed instead.</p>
-<table class="caption-top table">
+<table class="sortable caption-top table">
+<caption>List of publications</caption>
 <thead>
 <tr class="header">
 <th style="text-align: left;">#</th>
@@ -681,8 +677,8 @@ window.Quarto = {
 </tbody>
 </table>
 </section>
-<section id="feasibility-of-subclone-detection" class="level2" data-number="1.2">
-<h2 data-number="1.2" class="anchored" data-anchor-id="feasibility-of-subclone-detection"><span class="header-section-number">1.2</span> 2. Feasibility of subclone detection</h2>
+<section id="feasibility-of-subclone-detection" class="level2">
+<h2 class="anchored" data-anchor-id="feasibility-of-subclone-detection">Feasibility of subclone detection</h2>
 <p>Whether a subclone can be detected depends on tumor purity, the fraction of tumor cells in the subclone, sequencing depth, and how many mutations the subclone carries. For a single sample, the tables estimate whether a subclone separates from the clonal (trunk) mutations as its own cluster, and roughly how many mutations it needs.</p>
 <p>All values come from the model in Section 3, with these definitions:</p>
 <ul>
@@ -693,9 +689,10 @@ window.Quarto = {
 <li>Biological mutations needed is a rough count of the detected mutations a mixture model needs before it opens a separate cluster (10-15 for <span class="math inline">\(S \ge 4\)</span>, 20-30 for <span class="math inline">\(3 \le S &lt; 4\)</span>, 40-60 for <span class="math inline">\(2 \le S &lt; 3\)</span>, and 100 or more for marginal cases), divided by the retained fraction and rounded to the nearest 5.</li>
 </ul>
 <p>These are best-case estimates. They assume heterozygous mutations in diploid regions, the same depth at every site, known purity, pure binomial noise, and a single subclone alongside the trunk. Real data are harder. Exome coverage varies widely between sites, overdispersion widens VAF distributions (Section 3B), retained mutations are biased toward higher VAF (Section 3C), and copy-number changes, purity errors and the neutral tail can create or hide clusters (Section 4). The mutation counts are rules of thumb, not the result of a formal power calculation. To estimate power for a specific study design, simulate data and run it through the pipeline you plan to use.</p>
-<section id="x-typical-wes" class="level3" data-number="1.2.1">
-<h3 data-number="1.2.1" class="anchored" data-anchor-id="x-typical-wes"><span class="header-section-number">1.2.1</span> 100x (typical WES)</h3>
-<table class="caption-top table">
+<section id="x-typical-wes" class="level3">
+<h3 class="anchored" data-anchor-id="x-typical-wes">100x (typical WES)</h3>
+<table class="sortable caption-top table">
+<caption>Expectations for 100X WES</caption>
 <colgroup>
 <col style="width: 14%">
 <col style="width: 14%">
@@ -855,9 +852,10 @@ window.Quarto = {
 </tbody>
 </table>
 </section>
-<section id="x-deep-wes" class="level3" data-number="1.2.2">
-<h3 data-number="1.2.2" class="anchored" data-anchor-id="x-deep-wes"><span class="header-section-number">1.2.2</span> 200x (deep WES)</h3>
-<table class="caption-top table">
+<section id="x-deep-wes" class="level3">
+<h3 class="anchored" data-anchor-id="x-deep-wes">200x (deep WES)</h3>
+<table class="sortable caption-top table">
+<caption>Expectations for 200X WES</caption>
 <colgroup>
 <col style="width: 14%">
 <col style="width: 14%">
@@ -1019,38 +1017,39 @@ window.Quarto = {
 <p>A subclone present in 60% of tumor cells is often harder to detect than one present in 40%, because its VAF sits close to the trunk peak. At low purity the limit shifts from peak overlap to variant-caller attrition: at 10% purity, most subclonal mutations never reach the clustering step. For WGS at 30-60x, separation scores are roughly <span class="math inline">\(\sqrt{100/N}\)</span> times those in the 100x table (about 0.7 times at 50x), so a single WGS sample can resolve only well-separated subclones in high-purity tumors. WGS partly makes up for this by detecting far more mutations.</p>
 </section>
 </section>
-<section id="statistical-model-of-subclone-detection" class="level2" data-number="1.3">
-<h2 data-number="1.3" class="anchored" data-anchor-id="statistical-model-of-subclone-detection"><span class="header-section-number">1.3</span> 3. Statistical model of subclone detection</h2>
+<section id="statistical-model-of-subclone-detection" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-model-of-subclone-detection">Statistical model of subclone detection</h2>
 <p>The numbers in Section 2 depend on the binomial spread of each mutation’s VAF, on sequencing noise beyond the binomial, and on the loss of low-VAF mutations before clustering. They also depend on how clustering models decide how many clusters to report.</p>
-<section id="a.-binomial-variance-and-peak-separation-deltavaf" class="level3" data-number="1.3.1">
-<h3 data-number="1.3.1" class="anchored" data-anchor-id="a.-binomial-variance-and-peak-separation-deltavaf"><span class="header-section-number">1.3.1</span> A. Binomial variance and peak separation (<span class="math inline">\(\Delta\)</span>VAF)</h3>
+<section id="binomial-variance-and-peak-separation-deltavaf" class="level3">
+<h3 class="anchored" data-anchor-id="binomial-variance-and-peak-separation-deltavaf">Binomial variance and peak separation (<span class="math inline">\(\Delta\)</span>VAF)</h3>
 <p>Tools model the variant read count at each site (<span class="math inline">\(v_i\)</span>) against its total depth (<span class="math inline">\(N_i\)</span>). For a heterozygous mutation in a diploid region, the expected VAF (<span class="math inline">\(p_i\)</span>) is: <span class="math display">\[p_i = \frac{Purity \times CCF_i}{2}\]</span> where <span class="math inline">\(CCF_i\)</span> is the cancer cell fraction, the fraction of tumor cells carrying the mutation. Section 4A gives the formula for other copy-number states.</p>
 <p>Reads are a random sample, so the variant read count follows a binomial distribution, <span class="math inline">\(v_i \sim \text{Binomial}(N_i, p_i)\)</span>, and the standard deviation (<span class="math inline">\(\sigma\)</span>) of a single mutation’s observed VAF is: <span class="math display">\[\sigma = \sqrt{\frac{p_i(1-p_i)}{N_i}}\]</span></p>
 <p>The separation score divides the distance between the expected VAFs of two clusters by their combined spread: <span class="math display">\[S = \frac{|VAF_{trunk} - VAF_{subclone}|}{\sqrt{\sigma_{trunk}^2 + \sigma_{subclone}^2}}\]</span> Above about 4 the clusters separate cleanly, and 10-15 detected mutations are usually enough. Between 2 and 4 the distributions partly overlap and more mutations are needed. Below about 2 the combined histogram usually shows a single peak.</p>
 <p><span class="math inline">\(N_i\)</span> is the depth at each site, and exome coverage is uneven, so many sites are sequenced well below the mean and the real separation is lower than the score at mean depth suggests. In the benchmark by Tanner et al.&nbsp;(<em>Nat Commun</em> 2021, <a href="https://doi.org/10.1038/s41467-021-26698-7">DOI</a>), purity-corrected depth was one of the strongest predictors of accuracy. A low score does not make separation impossible, though. With <span class="math inline">\(n\)</span> mutations in a cluster, the standard error of the cluster’s mean VAF is roughly <span class="math inline">\(\sigma/\sqrt{n}\)</span>, so a mixture model can still resolve overlapping clusters if there are enough mutations. It does mean that many individual mutations will be assigned to the wrong cluster, and that the number of mutations needed rises steeply.</p>
 </section>
-<section id="b.-beta-binomial-sequencing-noise" class="level3" data-number="1.3.2">
-<h3 data-number="1.3.2" class="anchored" data-anchor-id="b.-beta-binomial-sequencing-noise"><span class="header-section-number">1.3.2</span> B. Beta-binomial sequencing noise</h3>
+<section id="beta-binomial-sequencing-noise" class="level3">
+<h3 class="anchored" data-anchor-id="beta-binomial-sequencing-noise">Beta-binomial sequencing noise</h3>
 <p>Real sequencing data vary more than the binomial model predicts, which is called overdispersion. Causes include PCR duplicates and amplification bias, differences in capture efficiency between baits, reference bias against the alternate allele during mapping, and local copy-number heterogeneity that the segmentation misses. Several tools, including PyClone and PyClone-VI, offer a beta-binomial likelihood with a precision (overdispersion) parameter to absorb it: <span class="math display">\[v_i \sim \text{Beta-Binomial}(N_i, p_i, \rho)\]</span> Overdispersion widens each cluster, lowers the effective separation score and raises the number of mutations needed. Fitting a pure binomial model to overdispersed data carries the opposite risk: it tends to split one real cluster into several spurious ones.</p>
 </section>
-<section id="c.-variant-caller-attrition-and-detection-bias" class="level3" data-number="1.3.3">
-<h3 data-number="1.3.3" class="anchored" data-anchor-id="c.-variant-caller-attrition-and-detection-bias"><span class="header-section-number">1.3.3</span> C. Variant caller attrition and detection bias</h3>
+<section id="variant-caller-attrition-and-detection-bias" class="level3">
+<h3 class="anchored" data-anchor-id="variant-caller-attrition-and-detection-bias">Variant caller attrition and detection bias</h3>
 <p>The somatic caller decides which mutations reach the clustering step. Mutect2 has no hard minimum number of alternate reads by default (it uses a likelihood-based score), but many pipelines add a minimum of 3-5 alternate reads, and every caller has low sensitivity when only a few reads support a variant. With a cutoff of <span class="math inline">\(\ge 4\)</span> alternate reads at 100x depth, the binomial model predicts the loss of about 14% of true mutations at 6% VAF (a mean of 6 alternate reads), 26% at 5% VAF, 43% at 4% VAF and 86% at 2% VAF.</p>
 <p>The surviving mutations are also biased. They are the ones that happened to receive extra alternate reads, so the observed VAFs of a subclone near the detection limit are too high. The subclone moves toward the trunk, the gap between them narrows, and the subclone’s CCF is overestimated. In multi-sample studies, force-call (genotype) the union of all mutations in every sample and record read counts even where a site was not called, because a mutation that was not called in a sample may still be present in it.</p>
 </section>
-<section id="d.-model-complexity-and-cluster-number" class="level3" data-number="1.3.4">
-<h3 data-number="1.3.4" class="anchored" data-anchor-id="d.-model-complexity-and-cluster-number"><span class="header-section-number">1.3.4</span> D. Model complexity and cluster number</h3>
+<section id="model-complexity-and-cluster-number" class="level3">
+<h3 class="anchored" data-anchor-id="model-complexity-and-cluster-number">Model complexity and cluster number</h3>
 <p>Every clustering method penalizes complexity in some way when it decides how many clusters the data support. Dirichlet-process models (PyClone, DPClust, PhyloWGS) use a concentration parameter that controls how readily a new cluster opens. Variational methods such as PyClone-VI fit a mixture with a sparsity-inducing prior and drop empty components. Others use BIC (QuantumClone) or a penalized likelihood (CliPP). Under all of these schemes, a few mutations at an intermediate VAF are cheaper to explain as noise around an existing cluster than as a new population, so a subclone is reported only once it has enough detected mutations. Because these settings can be tuned, results can change with the priors, the concentration parameter and even the random seed. Report the settings, and check that the inferred structure is stable across runs.</p>
 </section>
 </section>
-<section id="complications-in-real-data" class="level2" data-number="1.4">
-<h2 data-number="1.4" class="anchored" data-anchor-id="complications-in-real-data"><span class="header-section-number">1.4</span> 4. Complications in real data</h2>
+<section id="complications-in-real-data" class="level2">
+<h2 class="anchored" data-anchor-id="complications-in-real-data">Complications in real data</h2>
 <p>The feasibility analysis assumes diploid, heterozygous mutations and correct purity. Four further issues decide whether an inferred subclonal structure is real.</p>
-<section id="a.-copy-number-effects" class="level3" data-number="1.4.1">
-<h3 data-number="1.4.1" class="anchored" data-anchor-id="a.-copy-number-effects"><span class="header-section-number">1.4.1</span> A. Copy-number effects</h3>
+<section id="copy-number-effects" class="level3">
+<h3 class="anchored" data-anchor-id="copy-number-effects">Copy-number effects</h3>
 <p>Most solid tumors are aneuploid, and copy number changes how VAF relates to CCF. For a mutation present on <span class="math inline">\(m\)</span> copies (its multiplicity) at a locus with total tumor copy number <span class="math inline">\(CN_t\)</span>, and a normal copy number of 2: <span class="math display">\[VAF = \frac{Purity \times m \times CCF}{Purity \times CN_t + 2(1 - Purity)}\]</span></p>
 <p>The table gives the expected VAF of a clonal mutation (CCF = 1) at 50% purity in several copy-number states, and the CCF that a naive diploid conversion (<span class="math inline">\(CCF = 2 \times VAF / Purity\)</span>) would report:</p>
-<table class="caption-top table">
+<table class="sortable caption-top table">
+<caption>Effect of CN on expected VAF and CCF</caption>
 <colgroup>
 <col style="width: 20%">
 <col style="width: 20%">
@@ -1125,62 +1124,62 @@ window.Quarto = {
 <p>A deletion can also remove the allele carrying a mutation in a descendant lineage, so a clonal mutation looks subclonal or disappears from one region of a multi-region study. This breaks the infinite-sites assumption behind most tree-building methods. CONIPHER, PhyClone, DeCiFer and SPRUCE allow for mutation loss. With other tools, treat mutations in regions with subclonal losses with caution.</p>
 <p>MOBSTER analyzes mutations separately by karyotype (for example 1:1, 2:1 and 2:2), and the same split makes a good quality check: in each karyotype, the clonal cluster should sit where theory predicts.</p>
 </section>
-<section id="b.-upstream-errors-in-purity-ploidy-and-copy-number-calls" class="level3" data-number="1.4.2">
-<h3 data-number="1.4.2" class="anchored" data-anchor-id="b.-upstream-errors-in-purity-ploidy-and-copy-number-calls"><span class="header-section-number">1.4.2</span> B. Upstream errors in purity, ploidy and copy-number calls</h3>
+<section id="upstream-errors-in-purity-ploidy-and-copy-number-calls" class="level3">
+<h3 class="anchored" data-anchor-id="upstream-errors-in-purity-ploidy-and-copy-number-calls">Upstream errors in purity, ploidy and copy-number calls</h3>
 <p>Every CCF depends on the purity and copy-number estimates supplied as input, so an upstream error affects every mutation.</p>
 <p>Purity and ploidy are often ambiguous. A copy-number caller can fit the same data almost equally well with different combinations, such as a near-diploid tumor at one purity and a near-tetraploid tumor at another. Picking the wrong solution rescales every CCF and can create or remove whole clusters. Smaller purity errors move the clonal peak. If purity is underestimated, clonal mutations appear to have CCFs above 1; if it is overestimated, they appear subclonal and may be reported as a large subclone.</p>
 <p>Copy-number calls from WES are noisier than calls from WGS. Off-target reads, uneven capture and fewer heterozygous SNPs make segmentation and allele-specific calls less reliable from exomes. In the Tanner et al.&nbsp;WES benchmark, the best pipeline combined Mutect2, FACETS and PyClone-VI, so the choice of copy-number caller mattered. Other sources of error include tumor cells contaminating the matched normal (which removes true mutations or lowers their VAFs), poorly mappable or repetitive regions, sex chromosomes, and segmentation errors near breakpoints.</p>
 <p>In the ICGC-TCGA DREAM benchmark (Salcedo et al., <em>Nat Biotechnol</em> 2024, <a href="https://doi.org/10.1038/s41587-024-02250-y">DOI</a>), copy-number state, purity-adjusted depth and read mappability affected the performance of most methods. Before clustering, confirm that the clonal mutation peak lies at CCF ≈ 1 in each major karyotype. Compare purity estimates from at least two independent methods (such as ABSOLUTE, ASCAT, FACETS or Sequenza) with the purity implied by the mutation VAFs, and look at VAF histograms for each copy-number state. A quality-control tool such as CNAqc (Antonello et al., <em>Genome Biol</em> 2024) tests whether the copy-number calls and mutation VAFs agree.</p>
 </section>
-<section id="c.-the-neutral-tail" class="level3" data-number="1.4.3">
-<h3 data-number="1.4.3" class="anchored" data-anchor-id="c.-the-neutral-tail"><span class="header-section-number">1.4.3</span> C. The neutral tail</h3>
+<section id="the-neutral-tail" class="level3">
+<h3 class="anchored" data-anchor-id="the-neutral-tail">The neutral tail</h3>
 <p>Cells in every expanding clone keep acquiring new mutations, each carried by a small fraction of cells. Under neutral growth these form a long tail of low-frequency mutations whose number keeps rising toward lower VAF. The tail follows a power law, with the cumulative number of mutations above frequency <span class="math inline">\(f\)</span> roughly proportional to <span class="math inline">\(1/f\)</span>. It is real biology, but it does not correspond to a distinct subpopulation.</p>
 <p>Standard mixture models assume every mutation belongs to a discrete cluster, so they tend to fit the tail with one or more spurious low-CCF subclones. Deep WGS makes this worse because it detects many tail mutations, and the caller’s detection limit cuts the tail off so that it looks like a hump just above the threshold. MOBSTER (Caravagna et al., <em>Nat Genet</em> 2020, <a href="https://doi.org/10.1038/s41588-020-0675-5">DOI</a>) models the tail as a Pareto component alongside beta-distributed clusters. Its authors showed that ignoring the tail causes systematic errors, especially across multiple samples. Treat the lowest-CCF cluster in any analysis as suspect until other evidence supports it, particularly if it sits just above the detection limit.</p>
 </section>
-<section id="d.-multi-region-and-longitudinal-sampling" class="level3" data-number="1.4.4">
-<h3 data-number="1.4.4" class="anchored" data-anchor-id="d.-multi-region-and-longitudinal-sampling"><span class="header-section-number">1.4.4</span> D. Multi-region and longitudinal sampling</h3>
+<section id="multi-region-and-longitudinal-sampling" class="level3">
+<h3 class="anchored" data-anchor-id="multi-region-and-longitudinal-sampling">Multi-region and longitudinal sampling</h3>
 <p>A single bulk sample can only separate subclones whose CCFs differ in that sample. Two distinct subclones with similar prevalence in one region merge into one cluster, and one sample usually cannot tell a linear tree from a branching one. With several regions or time points, each mutation has a vector of CCFs, and clusters that overlap in one sample are often well separated in another. Multi-sample data also reveal region-specific subclones and constrain the tree topology much more tightly.</p>
 <p>Sequencing several samples at standard depth can therefore be more informative than sequencing one sample very deeply. The MAGOS authors (Ahmadinejad et al., <em>Mol Biol Evol</em> 2022, <a href="https://doi.org/10.1093/molbev/msac136">DOI</a>) made this case on cost grounds.</p>
 <p>Multi-region designs have their own requirements. Force-call every mutation in every sample (Section 3C), so that a missing mutation reflects biology rather than detection limits. Estimate purity and copy number separately for each sample, since both often differ between regions. Use methods built for multiple samples, such as PyClone-VI, DPClust, Pairtree, CONIPHER, PhyClone or DeCiFer. Watch for sampling bias too: a mutation that is clonal in every sampled region may still be subclonal in the tumor as a whole (the “illusion of clonality”), and low-purity regions add little information.</p>
 </section>
 </section>
-<section id="intuitive-guide-for-bioinformaticians" class="level2" data-number="1.5">
-<h2 data-number="1.5" class="anchored" data-anchor-id="intuitive-guide-for-bioinformaticians"><span class="header-section-number">1.5</span> 5. Intuitive guide for bioinformaticians</h2>
+<section id="intuitive-guide-for-bioinformaticians" class="level2">
+<h2 class="anchored" data-anchor-id="intuitive-guide-for-bioinformaticians">Intuitive guide for bioinformaticians</h2>
 <p><em>This section explains the ideas above without the statistics, and what they mean for your pipeline.</em></p>
-<section id="coverage-is-focus-the-blurry-eye-chart" class="level3" data-number="1.5.1">
-<h3 data-number="1.5.1" class="anchored" data-anchor-id="coverage-is-focus-the-blurry-eye-chart"><span class="header-section-number">1.5.1</span> 1. Coverage is focus: the blurry eye chart</h3>
+<section id="coverage-is-focus-the-blurry-eye-chart" class="level3">
+<h3 class="anchored" data-anchor-id="coverage-is-focus-the-blurry-eye-chart">Coverage is focus: the blurry eye chart</h3>
 <p>Think of a histogram of your VAFs as an eye chart. The trunk clone is a large letter at the top, the subclone a smaller letter further down, and sequencing depth is your glasses. At 40x WGS the glasses are poor. Every mutation’s VAF is blurred across the chart, and if the trunk and subclone are close together their blur merges into one blob. The algorithm cannot sharpen the image: if you cannot see two humps in the histogram, the clustering tool will usually report one clone. At 200x or 300x the glasses are strong, mutations sit close to their true VAFs, the overlap shrinks, and the algorithm can separate the two groups. The depth that counts is the depth at each site after allowing for purity. A tumor at 30% purity sequenced at 200x carries as much tumor information as a pure tumor at 60x.</p>
 </section>
-<section id="why-a-subclone-needs-enough-mutations" class="level3" data-number="1.5.2">
-<h3 data-number="1.5.2" class="anchored" data-anchor-id="why-a-subclone-needs-enough-mutations"><span class="header-section-number">1.5.2</span> 2. Why a subclone needs enough mutations</h3>
+<section id="why-a-subclone-needs-enough-mutations" class="level3">
+<h3 class="anchored" data-anchor-id="why-a-subclone-needs-enough-mutations">Why a subclone needs enough mutations</h3>
 <p>Clustering tools follow a form of Occam’s razor and prefer the simplest explanation. Given a large peak of 100 mutations at 25% VAF and three stray mutations at 10%, the algorithm effectively asks: <em>“Is it more likely that a separate population of cancer cells exists just for these three mutations, or that these are noisy reads of the main tumor?”</em> It almost always picks the second answer. Depending on how far the subclone sits from the trunk, it typically needs from about 10 to more than 50 detected mutations before the algorithm accepts it. These settings can be tuned, so check that your result does not depend on a particular prior or random seed.</p>
 </section>
-<section id="the-death-valley-of-variant-callers" class="level3" data-number="1.5.3">
-<h3 data-number="1.5.3" class="anchored" data-anchor-id="the-death-valley-of-variant-callers"><span class="header-section-number">1.5.3</span> 3. The “Death Valley” of variant callers</h3>
+<section id="the-limits-of-variant-callers" class="level3">
+<h3 class="anchored" data-anchor-id="the-limits-of-variant-callers">The limits of variant callers</h3>
 <p>Variant callers are built to avoid false positives, and most pipelines discard mutations with only a few supporting reads, so the caller can remove much of a subclone before clustering starts. If your subclone sits at 6% VAF and average depth is 100x, a typical subclonal mutation has 6 variant reads, and about 1 in 7 will fall below a 4-read cutoff by chance. At 4% VAF almost half are lost, and at 2% nearly all. The survivors are the ones that happened to get extra reads, so the subclone also looks closer to the trunk than it really is. If the clustering tool needs 20 detected mutations to accept a subclone at 4% VAF, the subclone must carry about 35-40 real mutations for enough of them to survive.</p>
 </section>
-<section id="copy-number-moves-the-humps" class="level3" data-number="1.5.4">
-<h3 data-number="1.5.4" class="anchored" data-anchor-id="copy-number-moves-the-humps"><span class="header-section-number">1.5.4</span> 4. Copy number moves the humps</h3>
+<section id="copy-number-moves-the-humps" class="level3">
+<h3 class="anchored" data-anchor-id="copy-number-moves-the-humps">Copy number moves the humps</h3>
 <p>A mutation’s VAF depends on how many cells carry it, how many copies of the chromosome those cells have, and how many of those copies carry the mutation. In a genome-doubled tumor, clonal mutations form two humps, one at half the VAF of the other, and a diploid model calls the lower hump a subclone. Before trusting a subclone, check which copy-number states its mutations come from. A “subclone” made up mostly of mutations from gained, lost or doubled regions is very likely a copy-number artifact.</p>
 </section>
-<section id="purity-and-copy-number-errors-carry-through" class="level3" data-number="1.5.5">
-<h3 data-number="1.5.5" class="anchored" data-anchor-id="purity-and-copy-number-errors-carry-through"><span class="header-section-number">1.5.5</span> 5. Purity and copy-number errors carry through</h3>
+<section id="purity-and-copy-number-errors-carry-through" class="level3">
+<h3 class="anchored" data-anchor-id="purity-and-copy-number-errors-carry-through">Purity and copy-number errors carry through</h3>
 <p>Every CCF is calculated from the purity and copy-number estimates you supply. If purity is overestimated, the whole distribution shifts left and the clonal peak is reported as a large subclone. Check that the clonal peak lands at CCF ≈ 1 before you interpret anything below it.</p>
 </section>
-<section id="a-low-bump-is-not-always-a-subclone" class="level3" data-number="1.5.6">
-<h3 data-number="1.5.6" class="anchored" data-anchor-id="a-low-bump-is-not-always-a-subclone"><span class="header-section-number">1.5.6</span> 6. A low bump is not always a subclone</h3>
-<p>Growing tumors constantly pick up private mutations carried by few cells. Deep sequencing detects them as a long low-VAF tail, which clustering tools tend to split off as a fake minor subclone, especially just above the caller’s detection limit. Treat the lowest cluster with suspicion, or use a tool such as MOBSTER that models the tail.</p>
+<section id="a-low-bump-is-not-always-a-subclone" class="level3">
+<h3 class="anchored" data-anchor-id="a-low-bump-is-not-always-a-subclone">A low bump is not always a subclone</h3>
+<p>Growing tumors constantly pick up private mutations carried by few cells. Deep sequencing detects them as a long low-VAF tail, which clustering tools tend to split off as a fake minor subclone, especially just above the caller’s detection limit. FFPE artifacts frequently appear as clusters of low VAF mutations. Treat the lowest cluster with suspicion, or use a tool such as MOBSTER that models the tail.</p>
 </section>
-<section id="more-samples-can-beat-more-depth" class="level3" data-number="1.5.7">
-<h3 data-number="1.5.7" class="anchored" data-anchor-id="more-samples-can-beat-more-depth"><span class="header-section-number">1.5.7</span> 7. More samples can beat more depth</h3>
+<section id="more-samples-can-beat-more-depth" class="level3">
+<h3 class="anchored" data-anchor-id="more-samples-can-beat-more-depth">More samples can beat more depth</h3>
 <p>Two subclones that look identical in one biopsy often look different in another. If the budget allows, sequencing two or three regions at standard depth often reveals more structure than sequencing one region twice as deep, and it is the only reliable way to resolve branching evolution. Force-call all mutations in all samples so that a mutation that went undetected is not counted as absent.</p>
 </section>
-<section id="summary" class="level3" data-number="1.5.8">
-<h3 data-number="1.5.8" class="anchored" data-anchor-id="summary"><span class="header-section-number">1.5.8</span> Summary</h3>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
 <p>Subclonal deconvolution can only find what the data support. With tumor purity below about 30% and standard 100x WES, only well-separated subclones that carry many mutations are detectable. Purer samples, deeper sequencing, more regions, and checked purity and copy-number calls improve results far more than a more sophisticated algorithm. Whatever tool you use, interpret its clusters in light of copy number, purity and the neutral tail before treating them as cell populations.</p>
 
 
-</section>
 </section>
 </section>
 
